@@ -2,12 +2,18 @@ import { useState } from 'react'
 import api from '../../services/api'
 
 function Category(props) {
+    /**
+     * Lógica para o modal
+     */
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [categoryName, setCategoryName] = useState('')
 
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
 
+    /**
+     * Form para enviar os dados da categoria
+     */
     const handleSubmit = async(e) => {
         e.preventDefault()
 
@@ -39,23 +45,23 @@ function Category(props) {
 
             {isModalOpen && (
             <div className="modal modal-open text-slate-400">
-            <div className="modal-box">
-            <h3 className="font-bold text-lg text-white">Adicionar nova categoria</h3>
+                <div className="modal-box">
+                    <h3 className="font-bold text-lg text-white">Adicionar nova categoria</h3>
 
-            <form onSubmit={handleSubmit}>
-                <div className="form-control mb-4">
-                <label className="label">
-                    <span className="label-text text-white">Nome da categoria</span>
-                </label>
-                <input type="text" placeholder="Digite o nome da categoria" className="input input-bordered placeholder:text-slate-300" required value={categoryName} onChange={(e) => setCategoryName(e.target.value)} name='category-name' />
-                </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-control mb-4">
+                            <label className="label">
+                                <span className="label-text text-white">Nome da categoria</span>
+                            </label>
+                            <input type="text" placeholder="Digite o nome da categoria" className="input input-bordered placeholder:text-slate-300" required value={categoryName} onChange={(e) => setCategoryName(e.target.value)} name='category-name' />
+                        </div>
 
-                <div className="modal-action">
-                <label htmlFor="category-modal" className="btn" onClick={closeModal}>Cancelar</label>
-                <button type="submit" className="btn btn-primary">Salvar</button>
+                        <div className="modal-action">
+                            <label htmlFor="category-modal" className="btn" onClick={closeModal}>Cancelar</label>
+                            <button type="submit" className="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-            </div>
             </div>
         )}
         </>

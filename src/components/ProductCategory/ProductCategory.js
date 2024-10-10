@@ -6,6 +6,10 @@ import Loading from '../Loading/Loading'
 import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
 
+/**
+ * Componente que exibe o container da categoria com os produtos dentro
+ */
+
 function ProductCategory(props) {
   /**
    * Criação da renderização do componente de loading
