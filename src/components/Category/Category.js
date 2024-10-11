@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import api from '../../services/api'
 
+/**
+ * Container para adicionar uma nova categoria
+ */
+
 function Category(props) {
     /**
      * Lógica para o modal

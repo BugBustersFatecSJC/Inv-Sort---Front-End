@@ -3,6 +3,7 @@ import './ProductCategory.module.css'
 import styles from './ProductCategory.module.css'
 import api from '../../services/api'
 import Loading from '../Loading/Loading'
+import Modal from '../Modal/Modal'
 import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
 
@@ -78,12 +79,20 @@ function ProductCategory(props) {
     }, [])
 
     /**
-     * Abre e fecha o modal de cadastro
+     * Abre e fecha o modal de produtos
      */
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
+
+    /**
+     * Abre e fecha o modal de categorias
+     */
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+
+    const openCategoryModal = () => setIsCategoryModalOpen(true)
+    const closeCategoryModal = () => setIsCategoryModalOpen(false)
 
     /**
      * Criação da requisição para envio ao servidor back-end
@@ -131,7 +140,7 @@ function ProductCategory(props) {
         .delete(`/products/${product_id}`)
         .then((response) => {
           props.onProductDeleted(response.data)
-        });
+        })
     } catch (err) {
       console.log(err)
     }
@@ -139,9 +148,75 @@ function ProductCategory(props) {
 
   const [hoveredProductId, setHoveredProductId] = useState(null)
 
+  /**
+   * Funcionalidade de abrir o container de categoria
+   */
+  const [showCategoryProducts, setShowCategoryProducts] = useState(false)
+
+  const handleClickShow = () => {
+    setShowCategoryProducts(!showCategoryProducts)
+  }
+
+  /**
+   * Edição da categoria
+   */
+  const [categoryName, setCategoryName] = useState('')
+
+  const handleCategoryUpdate = async(e) => {
+      e.preventDefault()
+
+      const categoryData = {
+          category_name: categoryName,
+      }
+
+      try {
+          await api
+          .put(`/category/${props.categoryKey}`, categoryData)
+          .then(response => console.log(response))
+          
+          props.onCategoryUpdated(props.categoryKey, categoryName)
+          setCategoryName('')
+
+          closeCategoryModal()
+      } catch (err) {
+          console.log(err)
+      }
+  }
+
+  /**
+   * Deleta a categoria
+   */
+  const handleCategoryDelete = async (category_id) => {
+    try {
+      await api
+        .delete(`/category/${category_id}`)
+        .then((response) => {
+          props.onCategoryDeleted(response.data)
+        })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
     return (
+      // Container da categoria
     <div className='w-full alt-color-2-bg rounded border-[15px] border-[#6B3710] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] mt-4'>
-        <div className='border-l-[6px] border-r-[6px] border-[#D87B26] p-[1rem] h-[200px] overflow-y-auto flex flex-wrap'>
+        <div className='border-l-[6px] border-r-[6px] border-[#D87B26] p-[1rem] h-[200px] overflow-y-auto flex flex-wrap relative'>
+          <div className={`transition-opacity duration-200 absolute inset-0 alt-color-6-bg z-10 flex flex-col items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className='w-[6rem] h-[6rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'></div>
+            <p className='my-2 font-pixel text-xl'>{ props.categoryName }</p>
+            <div className='flex justify-evenly w-[10%]'>
+              <p className='cursor-pointer' onClick={handleClickShow}>
+                <i class="fa-solid fa-eye"></i>
+              </p>
+              <p className='cursor-pointer' onClick={() => handleCategoryDelete(props.categoryKey)}>
+                <i class="fa-solid fa-trash"></i>
+              </p>
+              <p className='cursor-pointer' onClick={openCategoryModal}>
+                <i class="fa-solid fa-pencil"></i>
+              </p>
+            </div>
+          </div>
             {/*
               Aqui ocorre a criação de cada quadrado, é obtido uma lista com todos os produtos
               que são mapeados, cada produto irá gerar um quadrado e cada quadrado terá sua tooltip           
@@ -197,7 +272,7 @@ function ProductCategory(props) {
                 <label className="label">
                   <span className="label-text text-white">Nome do produto</span>
                 </label>
-                <input type="texconst [hoveredProductId, setHoveredProductId] = useState(null)" placeholder="Digite o nome do produto" className="input input-bordered placeholder:text-slate-300" required name='product_name' value={productName} onChange={(e) => setProductName(e.target.value)} />
+                <input type="text" placeholder="Digite o nome do produto" className="input input-bordered placeholder:text-slate-300" required name='product_name' value={productName} onChange={(e) => setProductName(e.target.value)} />
               </div>
 
               <div className="form-control mb-4">
@@ -247,6 +322,17 @@ function ProductCategory(props) {
             </form>
           </div>
           </div>
+      )}
+
+      {isCategoryModalOpen && (
+        <Modal closeModal={closeCategoryModal} handleSubmit={handleCategoryUpdate} title="Atualizar categoria" modalName="category-modal">
+              <div className="form-control mb-4">
+                <label className="label">
+                  <span className="label-text text-white">Nome da categoria</span>
+                </label>
+                <input type="text" placeholder="Digite o novo nome da categoria" className="input input-bordered placeholder:text-slate-300" required name='category_name' value={categoryName} onChange={(e) => setCategoryName(e.target.value)} />
+              </div>
+        </Modal>
       )}
     </div>
     )
