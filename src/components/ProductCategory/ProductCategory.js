@@ -138,9 +138,8 @@ function ProductCategory(props) {
     try {
       await api
         .delete(`/products/${product_id}`)
-        .then((response) => {
-          props.onProductDeleted(response.data)
-        })
+        .then((response) => {console.log(response)})
+        props.onProductDeleted(product_id)
     } catch (err) {
       console.log(err)
     }
@@ -190,9 +189,9 @@ function ProductCategory(props) {
     try {
       await api
         .delete(`/category/${category_id}`)
-        .then((response) => {
-          props.onCategoryDeleted(response.data)
-        })
+        .then((response) => {console.log(response)})
+
+        props.onCategoryDeleted(category_id)
     } catch (err) {
       console.log(err)
     }
