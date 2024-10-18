@@ -7,9 +7,9 @@ import Loading from '../../components/Loading/Loading'
 
 
 function MainPageRender() {
-    /**
-     * Renderização do componente de loading
-     */
+  /**
+   * Renderização do componente de loading
+   */
   const [loading, setLoading] = useState(true)
 
   /**
@@ -22,9 +22,9 @@ function MainPageRender() {
   const fetchCategories = async () => {
     try {
       await api.get('/category')
-      .then(response => setCategories(response.data))
+        .then(response => setCategories(response.data))
       fetchProducts()
-    } catch(err) {
+    } catch (err) {
       console.log(err)
     }
   }
@@ -34,8 +34,8 @@ function MainPageRender() {
   const fetchProducts = async () => {
     try {
       await api.get('/products')
-      .then(response => setProducts(response.data))
-    } catch(err) {
+        .then(response => setProducts(response.data))
+    } catch (err) {
       console.log(err)
     } finally {
       setLoading(false)
@@ -95,9 +95,11 @@ function MainPageRender() {
    */
   const removeCategory = (categoryId) => {
     setCategories((prevCategories) => prevCategories.filter(
-      category => category.category_id !== categoryId 
+      category => category.category_id !== categoryId
     ))
   }
+
+
 
   /**
    * Funcionalidade para checar se há algum usuário no banco de dados, se sim,
@@ -113,20 +115,22 @@ function MainPageRender() {
   //       console.log(err)
   //     })
   // }, [])
-    return (
-        <MainPage title="Produtos">
-            {loading ? (
-            <Loading />
-            ) :
-            categories.map((category) => {
-            const categoryProducts = products.filter(product => product.category_id === category.category_id);
-            return (
-                <ProductCategory key={category.category_id} categoryKey={category.category_id} products={categoryProducts} onProductAdded={addProduct} onProductDeleted={removeProduct} categoryName={category.category_name} onCategoryUpdated={updateCategory} onCategoryDeleted={removeCategory} onProductUpdated={updateProduct} />
-            )
-            })}
-            <Category onCategoryAdded={addCategory} />
-        </MainPage> 
-    )
-  }
-  
-  export default MainPageRender
+  return (
+    <MainPage title="Produtos">
+      {loading ? (
+        <Loading />
+      ) :
+        categories.map((category) => {
+          const categoryProducts = products.filter(product => product.category_id === category.category_id);
+          return (
+            <ProductCategory key={category.category_id} categoryKey={category.category_id} products={categoryProducts} onProductAdded={addProduct} onProductDeleted={removeProduct} categoryName={category.category_name} onCategoryUpdated={updateCategory} onCategoryDeleted={removeCategory} onProductUpdated={updateProduct} />
+          )
+        })}
+      <Category onCategoryAdded={addCategory} />
+    </MainPage>
+  )
+}
+
+
+
+export default MainPageRender
