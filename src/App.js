@@ -13,6 +13,8 @@ import MainPageRender from './pages/MainPageRender/MainPageRender'
 import MovimentsPage from './pages/MovementPage/MovementPage'
 import UserPage from './pages/UserPage/UserPage'
 import Analytics from './pages/Analytics/Analytics'
+import BuyAndSell from './pages/BuyAndSell/BuyAndSell'
+
 
 /* ProtectedRoute redireciona o usuario para a pagina de login, caso o mesmo não esteja logado
 IMPORTANTE: Use essa função em toda página que não deve ser acessada antes do login */
@@ -41,6 +43,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/userpage" element={<ProtectedRoute element={UserPage} />} />
           <Route path="/movements" element={<MovimentsPage />} />
+          <Route path="/buyandsell" element={<BuyAndSell />} />
         </Routes>
       </Router>
     </div>
