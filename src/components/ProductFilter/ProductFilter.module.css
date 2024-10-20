@@ -1,0 +1,31 @@
+/* ProductFilter.module.css */
+
+.filterContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.filterInput {
+    padding: 8px;
+    border: 2px solid #B45105;
+    border-radius: 4px;
+    background-color: #FFCB8F;
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+}
+
+.submitButton {
+    padding: 10px;
+    background-color: #3E1A00;
+    color: #FFCB8F;
+    border-radius: 4px;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.submitButton:hover {
+    background-color: #4E2C00;
+}

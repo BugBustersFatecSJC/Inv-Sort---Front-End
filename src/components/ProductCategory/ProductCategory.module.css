@@ -20,3 +20,23 @@ button {
 .myTippyTheme .tippy-arrow {
     color: #FFCB8F;
 }
+.filterButton {
+    background-color: #3E1A00;
+    color: #FFCB8F;
+    padding: 5px 5px;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .filterButton:hover {
+    background-color: #4E2C00;
+  }
+  
+  .filterButton i {
+    margin-right: 4px;
+  }

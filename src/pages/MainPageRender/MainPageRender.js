@@ -120,7 +120,7 @@ function MainPageRender() {
           categories.map((category) => {
           const categoryProducts = products.filter(product => product.category_id === category.category_id);
           return (
-              <ProductCategory key={category.category_id} categoryKey={category.category_id} products={categoryProducts} onProductAdded={addProduct} onProductDeleted={removeProduct} categoryName={category.category_name} onCategoryUpdated={updateCategory} onCategoryDeleted={removeCategory} onProductUpdated={updateProduct} />
+              <ProductCategory key={category.category_id} categoryKey={category.category_id} products={categoryProducts} onProductAdded={addProduct} onProductDeleted={removeProduct} categoryName={category.category_name} onCategoryUpdated={updateCategory} onCategoryDeleted={removeCategory} onProductUpdated={updateProduct} categoryImage={category.category_image} />
           )
           })}
           <Category onCategoryAdded={addCategory} />

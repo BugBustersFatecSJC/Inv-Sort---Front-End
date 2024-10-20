@@ -6,13 +6,14 @@ import Loading from '../Loading/Loading'
 import Modal from '../Modal/Modal'
 import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
+import { applyFilters } from '../FilterUtils/FilterUtils'
+import ProductFilter from '../ProductFilter/ProductFilter'
 import FlashMessage from '../../components/FlashMessage/FlashMessage'
 
-/******************************************************************************
- * Componente que exibe o container da categoria com os produtos dentro       *
- *****************************************************************************/
-
 function ProductCategory(props) {
+  const { products, categoryKey, onProductAdded, onProductDeleted, onCategoryUpdated } = props;
+  const [isFilterVisible, setFilterVisible] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState(products);
   /**
    * Criação da renderização do componente de loading
    */
@@ -39,20 +40,27 @@ function ProductCategory(props) {
      */
     const [flash, setFlash] = useState(null)
 
+    const showFlashMessage = (message, type) => {
+      setFlash(null)
+      setTimeout(() => {
+          setFlash({ message, type })
+      }, 0)
+    }
+
     const flashSuccess = () => {
-      setFlash({ message: 'Item adicionado com sucesso!', type: 'success' });
+      showFlashMessage('Item adicionado com sucesso!','success');
     }
 
     const flashError = () => {
-      setFlash({ message: 'Um erro aconteceu', type: 'error' });
+      showFlashMessage('Um erro aconteceu','error');
     };
 
     const flashInfo = () => {
-      setFlash({ message: 'Item atualizado', type: 'info' });
+      showFlashMessage('Item atualizado', 'info');
     }
 
     const flashDelete = () => {
-      setFlash({ message: 'Item deletado', type: 'success' });
+      showFlashMessage('Item deletado', 'success');
     }
     
     /**
@@ -91,14 +99,34 @@ function ProductCategory(props) {
      */
     useEffect(() => {
       const fetchData = async () => {
-        setLoading(true)
-        await fetchUnits()
-        await fetchSuppliers()
-        await fetchProducts()
-      }
+        setLoading(true);
+        try {
+          const unitResponse = await api.get('/unit');
+          setUnits(unitResponse.data);
+  
+          const supplierResponse = await api.get('/supplier');
+          setSuppliers(supplierResponse.data);
+  
+          setFilteredProducts(products);
+        } catch (err) {
+          console.log(err);
+        }
+        setLoading(false);
+      };
+  
+      fetchData();
+    }, [products]);
 
-      fetchData()
-    }, [])
+    const handleFilterChange = (filters) => {
+      // Implementando a lógica de aplicação de filtro
+      const filtered = products.filter(product => 
+        Object.keys(filters).every(key => 
+          !filters[key] || product[key]?.toString().toLowerCase().includes(filters[key].toLowerCase())
+        )
+      );
+      setFilteredProducts(filtered);
+    };
+
 
     /**
      * Abre e fecha o modal de produtos
@@ -295,7 +323,15 @@ function ProductCategory(props) {
     <div className='w-full alt-color-2-bg rounded border-[15px] border-[#6B3710] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] mt-4'>
         <div className='border-l-[6px] border-r-[6px] border-[#D87B26] p-[1rem] h-[200px] overflow-y-auto flex flex-wrap relative'>
           <div className={`transition-opacity duration-200 absolute inset-0 alt-color-6-bg z-10 flex flex-col items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className='w-[6rem] h-[6rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'></div>
+          <figure className='w-[6rem] h-[6rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'>
+            {props.categoryImage ? (
+              <img
+                src={`http://localhost:3001${props.categoryImage}`}
+                alt={props.categoryName}
+                className='w-full h-full object-cover rounded-full'
+              />
+            ) : null}
+          </figure>
             <p className='my-2 font-pixel text-xl'>{ props.categoryName }</p>
             <div className='flex justify-evenly w-[10%]'>
               <p className='cursor-pointer' onClick={handleClickShow}>
@@ -307,8 +343,19 @@ function ProductCategory(props) {
               <p className='cursor-pointer' onClick={openCategoryModal}>
                 <i class="fa-solid fa-pencil"></i>
               </p>
+              {/* Ícone para alternar a visibilidade do filtro */}
+              <p className='cursor-pointer' onClick={() => setFilterVisible(!isFilterVisible)}>
+                <i className="fa-solid fa-filter"></i>
+              </p>
+              
             </div>
           </div>
+          {isFilterVisible && (
+            <ProductFilter onFilterChange={handleFilterChange} />
+          )}
+          
+
+          
             {/*
               Aqui ocorre a criação de cada quadrado, é obtido uma lista com todos os produtos
               que são mapeados, cada produto irá gerar um quadrado e cada quadrado terá sua tooltip           
@@ -482,13 +529,13 @@ function ProductCategory(props) {
 
       {/* Componente flash message, verifica se o estado flash é true e então renderiza a flash message */}
       {flash && (
-        <FlashMessage
-          message={flash.message}
-          type={flash.type}
-          duration={3000}
-        />
+          <FlashMessage
+              message={flash.message}
+              type={flash.type}
+              duration={3000}
+              onClose={() => setFlash(null)}
+          />
       )}
-
     </div>
     )
 }
