@@ -77,6 +77,7 @@ function ProductCategory(props) {
           console.log(err)
       }
     }
+    useEffect(fetchUnits(),[])
     
     /**
      * Retorna todos os fornecedores
@@ -344,6 +345,15 @@ function ProductCategory(props) {
           {isFilterVisible && (
             <ProductFilter onFilterChange={handleFilterChange} />
           )}
+          <div className="product-grid">
+            {filteredProducts.map((product) => (
+              <Tooltip key={product.product_id} title={product.product_name} arrow theme="dark" delay={20} trigger="mouseenter">
+                <div className='product-square'>
+                  <p>{product.product_name}</p>
+                </div>
+              </Tooltip>
+            ))}
+          </div>
           
 
           
