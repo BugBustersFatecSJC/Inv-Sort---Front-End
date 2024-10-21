@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './ProductFilter.module.css';  // Use styles se for módulo
 
 function ProductFilter({ onFilterChange }) {
-  const [filters, setFilters] = useState({ product_name: '', unit: '', unit_id: '', supplier_id: '' });
+  const [filters, setFilters] = useState({ product_id: '', supplier_id: '', is_perishable: false });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,21 +13,9 @@ function ProductFilter({ onFilterChange }) {
     <div className={styles.filterContainer}>
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4 w-full">
         <input
-          type="text"
-          placeholder="Nome do Produto"
-          onChange={(e) => setFilters({ ...filters, product_name: e.target.value })}
-          className={styles.filterInput}
-        />
-        <input
-          type="text"
-          placeholder="Unidade (kg,lt,un)"
-          onChange={(e) => setFilters({ ...filters, unit: e.target.value })}
-          className={styles.filterInput}
-        />
-        <input
           type="number"
-          placeholder="ID da Unidade"
-          onChange={(e) => setFilters({ ...filters, unit_id: e.target.value })}
+          placeholder="ID do Produto"
+          onChange={(e) => setFilters({ ...filters, product_id: e.target.value })}
           className={styles.filterInput}
         />
         <input
@@ -36,6 +24,15 @@ function ProductFilter({ onFilterChange }) {
           onChange={(e) => setFilters({ ...filters, supplier_id: e.target.value })}
           className={styles.filterInput}
         />
+        <label className="flex items-center w-full">
+          <input
+            type="checkbox"
+            checked={filters.is_perishable}
+            onChange={(e) => setFilters({ ...filters, is_perishable: e.target.checked })}
+            className="mr-2"
+          />
+          Perecível
+        </label>
         <button type="submit" className={styles.submitButton}>
           Aplicar Filtro
         </button>

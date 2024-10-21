@@ -1,42 +1,40 @@
-button {
-    box-shadow: inset -2px 2px 2px rgba(0, 0, 0, 0.25);
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Gap uniforme entre seções */
+  padding: 16px;
+  overflow: hidden; /* Previne estouro visual */
 }
 
-.borderDepth {
-    border-left: 3px solid #FFE4A1;
-    border-bottom: 3px solid #FFE4A1;
-    border-top: 3px solid #D68F54;
-    border-right: 3px solid #D68F54;
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
-.myTippyTheme {
-    background-color: #FFCB8F;
-    color: #3E1A00;
-    font-family: 'VT323', monospace;
-    font-size: 1.4rem;
-    padding: 8px;
+.product-square {
+  width: calc(100% / 4 - 12px); /* Divisão dinâmica conforme espaço */
+  height: 100px;
+  background-color: #FFCB8F;
+  border: 2px solid #B45105;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-.myTippyTheme .tippy-arrow {
-    color: #FFCB8F;
+.filter-container {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centro no width do container */
+  padding: 10px;
+  box-sizing: border-box;
 }
-.filterButton {
-    background-color: #3E1A00;
-    color: #FFCB8F;
-    padding: 5px 5px;
-    border-radius: 4px;
-    border: none;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .filterButton:hover {
-    background-color: #4E2C00;
-  }
-  
-  .filterButton i {
-    margin-right: 4px;
-  }
+
+.filterContainer form {
+  width: 100%;
+  max-width: 800px; /* Torna máximo que layout suporta razoavelmente */
+  margin: 0 auto;
+}

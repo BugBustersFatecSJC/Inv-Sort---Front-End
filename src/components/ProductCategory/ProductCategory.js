@@ -98,33 +98,24 @@ function ProductCategory(props) {
      * Hook de useEffect para ativar as funções quando o componente é renderizado
      */
     useEffect(() => {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const unitResponse = await api.get('/unit');
-          setUnits(unitResponse.data);
-  
-          const supplierResponse = await api.get('/supplier');
-          setSuppliers(supplierResponse.data);
-  
-          setFilteredProducts(products);
-        } catch (err) {
-          console.log(err);
-        }
-        setLoading(false);
-      };
-  
-      fetchData();
+      setFilteredProducts(products);
     }, [products]);
 
-    const handleFilterChange = (filters) => {
-      // Implementando a lógica de aplicação de filtro
-      const filtered = products.filter(product => 
-        Object.keys(filters).every(key => 
-          !filters[key] || product[key]?.toString().toLowerCase().includes(filters[key].toLowerCase())
-        )
-      );
-      setFilteredProducts(filtered);
+    const handleFilterChange = async (filters) => {
+      try {
+        console.log("Filtros Aplicados:", filters); // Verifique os filtros a serem enviados
+        const queryString = new URLSearchParams(Object.fromEntries(
+          Object.entries(filters).filter(([_, value]) => value !== '')
+        )).toString();
+        
+        console.log("Query String:", queryString); // Confirme a string de consulta
+        
+        const response = await api.get(`/products/filter?${queryString}`);
+        console.log("Dados Recebidos:", response.data); // Confirme a resposta recebida
+        setFilteredProducts(response.data);
+      } catch (err) {
+        console.error("Erro ao aplicar filtro:", err);
+      }
     };
 
 
@@ -392,6 +383,7 @@ function ProductCategory(props) {
               </Tooltip>
               )
             })}
+            
 
             {/* Botão para adicionar novo produto */}
             <button
