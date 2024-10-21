@@ -6,7 +6,7 @@ function ProductFilter({ onFilterChange }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onFilterChange(filters);  // Passa os filtros atuais para o componente pai
+    onFilterChange(filters);
   };
 
   return (

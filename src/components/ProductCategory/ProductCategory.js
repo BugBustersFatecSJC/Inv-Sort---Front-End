@@ -77,7 +77,10 @@ function ProductCategory(props) {
           console.log(err)
       }
     }
-    useEffect(fetchUnits(),[])
+    useEffect(() => {
+      fetchUnits(products);
+    }, [products]);
+    
     
     /**
      * Retorna todos os fornecedores
@@ -94,6 +97,9 @@ function ProductCategory(props) {
         console.log(err)
       }
     }
+    useEffect(() => {
+      fetchSuppliers(products);
+    }, [products]);
 
     /**
      * Hook de useEffect para ativar as funções quando o componente é renderizado
@@ -309,6 +315,11 @@ function ProductCategory(props) {
       flashError()
     }
   }
+  const toggleCategoryAndFilterVisibility = () => {
+    setShowCategoryProducts(!showCategoryProducts);
+    setFilterVisible(!isFilterVisible);
+  };
+
 
     return (
       // Container da categoria
@@ -335,8 +346,8 @@ function ProductCategory(props) {
               <p className='cursor-pointer' onClick={openCategoryModal}>
                 <i class="fa-solid fa-pencil"></i>
               </p>
-              {/* Ícone para alternar a visibilidade do filtro */}
-              <p className='cursor-pointer' onClick={() => setFilterVisible(!isFilterVisible)}>
+              {/* Ícone para alternar a visibilidade do filtro */} 
+              <p className='cursor-pointer' onClick={() => toggleCategoryAndFilterVisibility()}>
                 <i className="fa-solid fa-filter"></i>
               </p>
               
@@ -345,15 +356,8 @@ function ProductCategory(props) {
           {isFilterVisible && (
             <ProductFilter onFilterChange={handleFilterChange} />
           )}
-          <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <Tooltip key={product.product_id} title={product.product_name} arrow theme="dark" delay={20} trigger="mouseenter">
-                <div className='product-square'>
-                  <p>{product.product_name}</p>
-                </div>
-              </Tooltip>
-            ))}
-          </div>
+          
+
           
 
           
@@ -361,10 +365,10 @@ function ProductCategory(props) {
               Aqui ocorre a criação de cada quadrado, é obtido uma lista com todos os produtos
               que são mapeados, cada produto irá gerar um quadrado e cada quadrado terá sua tooltip           
             */}
-            {props.products.map((product, index) => {
-              const unit = units.find((u) => u.unit_id === product.unit_id)?.unit_type || 'N/A'
-              return (
-                <Tooltip
+            {filteredProducts.map((product, index) => {
+            const unit = units.find((u) => u.unit_id === product.unit_id)?.unit_type || 'N/A'
+            return (
+              <Tooltip
                 key={index}
                 html={(
                   <div className={styles.myTippyTheme}>
@@ -391,8 +395,9 @@ function ProductCategory(props) {
                 )}
                 </div>
               </Tooltip>
-              )
-            })}
+            )
+          })}
+
             
 
             {/* Botão para adicionar novo produto */}
