@@ -70,7 +70,7 @@ function Login() {
         <div className='mt-[40px]'>
           <SendButton text="ENTRAR" />
         </div>
-        <a className='font-pixel mt-[20px] secondary-color' href='#'>
+        <a className='font-pixel mt-[20px] secondary-color' href='/cadastro'>
           Não tem cadastro?
         </a>
       </form>
