@@ -14,16 +14,24 @@ function Login() {
 
   // UseEffect para verificar se precisamos redirecionar para o cadastro
   useEffect(() => {
-    axios.get('http://localhost:3001/check-login')
+    console.log("Verificando usuários...");
+    axios.get('http://localhost:3001/check-first-login')
       .then(response => {
+        console.log("Resposta recebida:", response.data);
         if (response.data.needsRegistration) {
-          navigate('/cadastro'); // Redireciona para cadastro se necessário
+          navigate('/cadastro');
+        } else {
+          const user = localStorage.getItem("user");
+          if (!user) {
+            navigate('/login');
+          }
         }
       })
       .catch(error => {
         console.error("Erro ao verificar usuários:", error);
       });
   }, [navigate]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
