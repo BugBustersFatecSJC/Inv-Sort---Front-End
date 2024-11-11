@@ -30,21 +30,15 @@ function UserProfileIcon() {
 
   return (
     <div className='flex items-center'>
-      <div className='me-3'>
-        <p className='font-pixel text-2xl'>
+
+      <div className='me-3 flex flex-col justify-end text-end mr-4'> 
+        <p className='poppins-medium text-xl'>
           {jsonUser.username}
         </p>
-        <div className="flex justify-between">
-          <p className='font-pixel text-lg'>
-            {jsonUser.role}
-          </p>
-          <img
-            src="/img/logout.png"
-            className="w-6 h-6 ms-[20px] cursor-pointer"
-            alt="botão de logout"
-            onClick={handleLogout}
-          />
-        </div>
+        <p className='poppins-medium '>
+          {jsonUser.role}
+        </p>
+
       </div>
 
       <figure className='bg-white rounded-full w-[4.4rem] h-[4.4rem] cursor-pointer' onClick={navigateUserProfile}>
