@@ -58,12 +58,13 @@ const Sectorchart = () => {
   if (!loading) {
 
   return (
-    <ResponsiveContainer width={'100%'} height={200} className={'flex   mx-auto flex-col justify-between align-center items-center text-center'}>
+    <> <DropdownButtons options={anos} type='ano' label='Ano' onChange={(e) => { setSelectedValue(e.target.value);
+      console.log(e.target.value);}} padrao = {false} />
+     
+    <ResponsiveContainer width={'100%'} height={250} className={'flex   my-auto mx-auto  flex-col justify-between align-center items-center text-center'}>
       
-      <DropdownButtons options={anos} type='ano' label='Ano' onChange={(e) => { setSelectedValue(e.target.value);
-        console.log(e.target.value);}} padrao = {false} />
-       
-      <PieChart className='h-[90%] my-8'>
+     
+      <PieChart className='h-[90%] '>
         <Tooltip content={<Tooltipporcentagem />} />
         <Pie
           data={data}
@@ -75,8 +76,9 @@ const Sectorchart = () => {
           dataKey="total_difference"
           stroke="#ffc376"
           strokeWidth={2.5}
-          
-        >
+
+ >
+
           <LabelList dataKey="%" stroke='none'  fill='#ffc376' className='poppins-semibold text-white text-sm' />
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index]} />
@@ -87,6 +89,7 @@ const Sectorchart = () => {
         <Label className='border-[#B45105] border-4' data={data} colors={COLORS} />
       </div>
     </ResponsiveContainer>
+    </>
   );
 }
 };

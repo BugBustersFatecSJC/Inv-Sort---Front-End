@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { useState, useEffect } from 'react'
 import api from '../../services/api'
 
@@ -21,9 +22,10 @@ function DropdownButtons({ options = [],type, label, onChange, disabled = false,
   const opt =options;
   
   return (
-    <div className=' mx-2 w-full'>
+    <div className='  w-full align-start'>
       <select
         className={`${windowWidth >500?'w-[8rem]': 'w-[90%]'} poppins-semibold border-4 rounded border-[#B45105] bg-[#FFC376] animated-placeholder`}
+
         name="dropdown"
         id="filtrodrop"
         onChange={onChange}
@@ -40,9 +42,11 @@ function DropdownButtons({ options = [],type, label, onChange, disabled = false,
             {option[`${type}_name`]}
           </option>
           </>
+
         ))}
       </select>
     </div>
   )
 }
+
 export default DropdownButtons

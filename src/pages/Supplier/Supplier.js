@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
+
 import MainPage from '../MainPage/MainPage';
 import SupplierModal from '../../components/SupplierModal/SupplierModal';
 import Loading from '../../components/Loading/Loading';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import './Supplier.css'
+
 
 function SupplierPage() {
   const [loading, setLoading] = useState(true);
@@ -13,9 +15,11 @@ function SupplierPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const suppliersPerPage = 15;
   const [lastAddedId, setLastAddedId] = useState(null);
+
 
   const fetchSuppliers = async () => {
     try {
@@ -48,9 +52,11 @@ function SupplierPage() {
 
   const removeSupplier = async (supplierId) => {
     const confirmDelete = window.confirm('Você tem certeza que deseja excluir este fornecedor?');
+
     if (!confirmDelete) {
       return;
     }
+
 
     try {
       await api.delete(`/supplier/${supplierId}`);
@@ -65,6 +71,49 @@ function SupplierPage() {
   const toggleModal = (supplier = null) => {
     setSelectedSupplier(supplier);
     setShowModal(!showModal);
+    if (supplier) {
+      setSupplierName(supplier.supplier_name);
+      setContactInfo(supplier.contact_info || '');
+      setAddress(supplier.address || '');
+    } else {
+      setSupplierName('');
+      setContactInfo('');
+      setAddress('');
+      setNameError(null)
+    }
+  };
+
+  const showFlashMessage = (message, type) => {
+    setFlash({ message, type });
+    setTimeout(() => setFlash(null), 3000);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const supplierData = {
+      supplier_name: supplierName,
+      contact_info: contactInfo,
+      address: address,
+    };
+
+    try {
+      if (selectedSupplier) {
+        await api.put(`/supplier/${selectedSupplier.supplier_id}`, supplierData);
+        updateSupplier(selectedSupplier.supplier_id, supplierData);
+      } else {
+        const response = await api.post('/supplier', supplierData);
+        addSupplier(response.data);
+      }
+      showFlashMessage('Fornecedor salvo com sucesso!', 'success');
+      toggleModal();
+    } catch (err) {
+      console.log(err)
+      if (err.response && err.response.status === 400 && err.response.data.error.code === 'P2002') {
+          setNameError("Já existe um fornecedor com o mesmo nome")
+      }
+      showFlashMessage('Um erro aconteceu', 'error');
+    }
   };
 
   const handleSearch = (query) => {
@@ -90,6 +139,7 @@ function SupplierPage() {
       {loading ? (
         <Loading />
       ) : (
+
         <>
           <div className="product-table w-full bg-[#FFC376]">
             <div className=''>
@@ -189,11 +239,14 @@ function SupplierPage() {
             </div>
           </div>
         </>
+
       )}
 
-      {showModal && <SupplierModal supplier={selectedSupplier} onSupplierAdded={addSupplier} onSupplierUpdated={updateSupplier} onClose={toggleModal} />}
+      {flash && <FlashMessage  message={flash.message} type={flash.type} duration={3000} onClose={() => setFlash(null)}  />}
     </MainPage>
   );
 }
 
+
 export default SupplierPage;
+

@@ -61,7 +61,7 @@ function Analytics() {
         <Mainchart />
         </div>
         <div className={` w-full h-[420px] justify-evenly   mt-8 mb-4 ${windowWidth<980 ? "block   ":"flex " }`}>
-        <div className={` flex  flex-col  ${windowWidth<980 ? "w-full ":"w-1/2 mr-4"}  h-[100%] py-2  flex justify-between border-4   border-[rgb(180,81,5)] outline outline-4 outline-[rgb(107,55,16)] bg-[#FFC376]`}>
+        <div className={` flex  flex-col  ${windowWidth<980 ? "w-full  ":"w-1/2 mr-4"}   py-2  h-full flex border-4   border-[rgb(180,81,5)] outline outline-4 outline-[rgb(107,55,16)] bg-[#FFC376]`}>
         <Sectorchart />
          
         </div>

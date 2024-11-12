@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import FlashMessage from '../../components/FlashMessage/FlashMessage';
 
-function EditLocalModal({ localId, onClose, onLocalUpdated }) {
+function EditLocalModal({ localId, onClose }) {
   const [localName, setLocalName] = useState('');
   const [localAddress, setLocalAddress] = useState('');
   const [flash, setFlash] = useState(null);
@@ -29,7 +29,6 @@ function EditLocalModal({ localId, onClose, onLocalUpdated }) {
     e.preventDefault();
     try {
       const response = await api.put(`/local/${localId}`, { local_name: localName, local_address: localAddress });
-      onLocalUpdated(response.data);
       showFlashMessage('Local atualizado com sucesso!', 'success');
       onClose(); // Fecha o modal
     } catch (err) {

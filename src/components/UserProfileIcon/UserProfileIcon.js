@@ -1,50 +1,59 @@
-import React, { useState } from 'react'
-import { json, useNavigate } from 'react-router-dom'
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/userContext'; // Pegando o contexto do usuário
 
 function UserProfileIcon() {
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
+
   const navigateUserProfile = () => {
-    navigate('/profile')
-  }
+    navigate('/profile');
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('user')
-    navigate('/login')
+    localStorage.removeItem('user');  // Remove do localStorage
+    setUser(null);  // Também atualiza o estado do contexto
+    navigate('/login');  // Redireciona para login
+  };
+
+  // Não depende mais apenas de localStorage para exibir; usa Contexto
+  if (!user) {
+    return null;
   }
-  
-  const user = localStorage.getItem("user")
-  const jsonUser = JSON.parse(user)
+
   return (
     <div className='flex items-center'>
-      <div className='me-3'> 
-        <p className='font-pixel text-2xl'>
-          {jsonUser.username}
+
+      <div className='me-3 flex flex-col justify-end text-end mr-4'> 
+        <p className='poppins-medium text-xl'>
+          {user.username}
+
         </p>
         <div className="flex justify-between">
-        <p className='font-pixel text-lg'>
-          {jsonUser.role}
-        </p>
-        <img
-          src="/img/logout.png"
-          className="w-6 h-6 ms-[20px] cursor-pointer"
-          alt="botão de logout"
-          onClick={handleLogout}
-        />
+          <p className='font-pixel text-lg'>
+            {user.role}
+          </p>
+          <img
+            src="/img/logout.png"
+            className="w-6 h-6 ms-[20px] cursor-pointer"
+            alt="botão de logout"
+            onClick={handleLogout}
+          />
         </div>
+
       </div>
 
       <figure className='bg-white rounded-full w-[4.4rem] h-[4.4rem] cursor-pointer' onClick={navigateUserProfile}>
-        {jsonUser.user_img && (
+        {user.user_img && (
           <img
-            src={`http://localhost:3001${jsonUser.user_img}`}
-            class="w-full h-full rounded-full"
-            alt="teste"
+            src={`http://localhost:3001${user.user_img}`}
+            className="w-full h-full rounded-full"
+            alt="imagem do usuário"
           />
         )}
       </figure>
     </div>
-  )
+  );
 }
 
-export default UserProfileIcon
+export default UserProfileIcon;

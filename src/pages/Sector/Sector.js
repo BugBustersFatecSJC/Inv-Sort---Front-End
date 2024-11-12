@@ -2,29 +2,35 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { motion } from 'framer-motion';
 import MainPage from '../MainPage/MainPage';
+
 import LocalModal from '../../components/SectorModal/LocalModal';
 import SectorModal from '../../components/SectorModal/SectorModal';
 import EditSectorModal from '../../components/SectorModal/EditSectorModal';
 import EditLocalModal from '../../components/SectorModal/EditLocalModal';
+
 import Loading from '../../components/Loading/Loading';
+import FlashMessage from '../../components/FlashMessage/FlashMessage';
+import ShortModal from '../../components/ShortModal/ShortModal';
+import LocalModal from '../../components/SectorModal/LocalModal';
 import ModalDelete from '../../components/ModalDelete/ModalDelete';
 import SearchBar from '../../components/SearchBar/SearchBar';
 
-function LocalPage() {
+function Sector() {
   const [loading, setLoading] = useState(true);
   const [locals, setLocals] = useState([]);
   const [sectors, setSectors] = useState([]);
   const [showLocalModal, setShowLocalModal] = useState(false);
   const [showSectorModal, setShowSectorModal] = useState(false);
-  const [showEditSectorModal, setShowEditSectorModal] = useState(false);
-  const [showEditLocalModal, setShowEditLocalModal] = useState(false);
+  const [isEditingSector, setIsEditingSector] = useState(false);
   const [currentLocalId, setCurrentLocalId] = useState(null);
   const [currentSector, setCurrentSector] = useState(null);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const localsPerPage = 15;
   const [lastAddedId, setLastAddedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
 
   const fetchLocals = async () => {
     try {
@@ -88,17 +94,55 @@ function LocalPage() {
 
   const openSectorModal = (localId) => {
     setCurrentLocalId(localId);
+    setSectorName('');
+    setIsEditingSector(false);
+    setNameError(null);
     setShowSectorModal(true);
   };
 
   const openEditSectorModal = (sector) => {
     setCurrentSector(sector);
-    setShowEditSectorModal(true);
+    setSectorName(sector.sector_name);
+    setIsEditingSector(true);
+    setNameError(null);
+    setShowSectorModal(true);
   };
 
-  const openEditLocalModal = (local) => {
-    setCurrentLocalId(local.local_id);
-    setShowEditLocalModal(true);
+  const showFlashMessage = (message, type) => {
+    setFlash({ message, type });
+    setTimeout(() => setFlash(null), 3000);
+  };
+
+  const validateSectorName = (sectorName) => {
+    return sectors.some((sector) => sector.sector_name.toLowerCase() === sectorName.toLowerCase());
+  };
+
+  const handleSectorSubmit = async (e) => {
+    e.preventDefault();
+    if (validateSectorName(sectorName)) {
+      setNameError('Este setor já existe');
+      return;
+    }
+
+    try {
+      if (isEditingSector) {
+        const response = await api.put(`/sector/${currentSector.sector_id}`, { sector_name: sectorName });
+        updateSector(response.data);
+        showFlashMessage('Setor atualizado com sucesso!', 'success');
+      } else {
+        const response = await api.post('/sector', { sector_name: sectorName, local_id: currentLocalId });
+        addSector(response.data);
+        showFlashMessage('Setor adicionado com sucesso!', 'success');
+      }
+      setShowSectorModal(false);
+    } catch (err) {
+      console.error(err);
+      showFlashMessage('Erro ao salvar o setor', 'error');
+    }
+  };
+
+  const handleLocalAdded = (newLocal) => {
+    setLocals((prevLocals) => [...prevLocals, newLocal]);
   };
 
   const handleLocalDelete = async (e) => {
@@ -116,6 +160,7 @@ function LocalPage() {
     setCurrentLocalId(local.local_id);
     setOpenDeleteModal(true);
   };
+
 
   const deleteLocal = (localId) => {
     setLocals((prevLocals) => prevLocals.filter(local => local.local_id !== localId));
@@ -139,12 +184,14 @@ function LocalPage() {
   const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const goToPreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
+
   return (
     <MainPage title="Gestão de Locais e Setores">
       {loading ? (
         <Loading />
       ) : (
         <>
+
           <div className="product-table w-full bg-[#FFC376]">
             <div className=''>
               <div className='flex justify-between w-full items-end mb-6 table-header-container'>
@@ -268,18 +315,21 @@ function LocalPage() {
                   <img src="/img/pointer-1.svg" alt="" />
                 </button>
               </div>
+
             </div>
           </div>
         </>
       )}
 
+
       {showLocalModal && <LocalModal onLocalAdded={addLocal} onClose={() => setShowLocalModal(false)} />}
       {showSectorModal && <SectorModal localId={currentLocalId} onSectorAdded={addSector} onClose={() => setShowSectorModal(false)} />}
       {showEditSectorModal && <EditSectorModal sector={currentSector} onSectorUpdated={updateSector} onClose={() => setShowEditSectorModal(false)} />}
       {showEditLocalModal && <EditLocalModal localId={currentLocalId} onLocalUpdated={updateLocal} onClose={() => setShowEditLocalModal(false)} />}
+
       {openDeleteModal && <ModalDelete title="Deseja excluir o local?" handleSubmit={handleLocalDelete} closeModal={() => setOpenDeleteModal(false)} />}
     </MainPage>
   );
 }
 
-export default LocalPage;
+export default Sector;

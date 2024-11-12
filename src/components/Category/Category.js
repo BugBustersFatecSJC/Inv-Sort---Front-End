@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import FlashMessage from '../../components/FlashMessage/FlashMessage'
 import Modal from '../Modal/Modal'
@@ -7,10 +7,6 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
 
-/**
- * Container para adicionar uma nova categoria
- */
-
 function Category(props) {
     /**
      * Lógica para o modal
@@ -18,9 +14,16 @@ function Category(props) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [categoryName, setCategoryName] = useState('')
     const [categoryImage, setCategoryImage] = useState(null)
+    const [imagePreview, setImagePreview] = useState(null)
+    const [nameError, setNameError] = useState(null)
 
     const openModal = () => setIsModalOpen(true)
-    const closeModal = () => setIsModalOpen(false)
+    const closeModal = () => {
+        setIsModalOpen(false)
+        setCategoryName('')
+        setCategoryImage(null)
+        setNameError(null)
+    }
 
     const [imageSrc, setImageSrc] = useState(null); // Imagem original carregada
     const [croppedImage, setCroppedImage] = useState(null); // Imagem recortada

@@ -1,0 +1,23 @@
+@media screen and (max-width: 1190px) {
+    .short-modal {
+        max-width: 60%;
+    }
+}
+
+@media screen and (max-width: 842px) {
+    .short-modal .modal-action {
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 648px) {
+    .short-modal {
+        max-width: 80%;
+    }
+}
+
+@media screen and (max-width: 426px) {
+    .short-modal {
+        max-width: 950%;
+    }
+}
