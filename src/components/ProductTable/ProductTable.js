@@ -22,7 +22,7 @@ const ProductTable = () => {
     <div className="product-table w-full bg-[#FFC376] border-4 border-[#85450D]">
       <div className='border-4 border-[#B45105] p-6'>
         <h2 className="text-center font-pixel text-2xl mb-4 px-4 py-2">Frutas</h2>
-        <table className="w-full border-collapse ">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="">
               <th className=" text-xl font-pixel px-4 py-2">ID</th>

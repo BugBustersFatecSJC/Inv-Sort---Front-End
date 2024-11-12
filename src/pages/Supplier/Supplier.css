@@ -1,0 +1,10 @@
+@media screen and (max-width: 774px) {
+    .table-header-container {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .table-header-container > div.flex {
+        margin-top: 20px;
+    }
+}
