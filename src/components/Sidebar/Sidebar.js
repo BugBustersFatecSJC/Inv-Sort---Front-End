@@ -1,13 +1,13 @@
-
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import Watermark from '../Watermark/Watermark';
-import CategoryButtons from '../../components/CategoryButtons/CategoryButtons';
+import { UserContext } from '../../context/userContext';
+import { ZAxis } from 'recharts';
 
-function Sidebari({ role, content }) {
-  console.log('Current user role:', role);
+function Sidebari({ content }) {
+  const { role } = useContext(UserContext);
+  console.log('Current user role from context:', role);
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [collapsed, setCollapsed] = useState(false);
@@ -30,122 +30,145 @@ function Sidebari({ role, content }) {
     } else {
       setCollapsed(false);
     }
-  }, [window.innerWidth]);
-  const collapsedId = document.getElementById('collapse');
+  }, [windowWidth]);
+
   return (
-
-    <>
-    <div className={` flex bg-clip-border alt-color-bg   `}>
-      
-      <div className='mb-8 justify-center self-center flex-col flex-wrap   h-full  align-center text-center  py-4'>
-        <div className='text-center self-center  align-middle flex justify-center'>
-          {windowWidth > 450 ? <img  src={'img/logo_invsort.svg'} className={`w-[40%] sm:w-[30%] ${windowWidth<450?'rounded-m outline-4 outline-[#3E1900] bg-[#3E1900]':''}  mt-4 sb-button z-10`}  onClick={() => {if (windowWidth > 640) {
-              setCollapsed(!collapsed);
-              
-            } else {
-              setToggled(!toggled);
-              
-            }
-          }} alt=""/>
-           : null}
-            
+    <div className={`flex ${windowWidth > 640 ? 'max-w-[14rem]' : 'max-w-[8rem]'} bg-clip-border alt-color-bg`}>
+      <div className='mb-8 justify-center self-center flex-col flex-wrap max-w-[14rem] w-full h-full align-center text-center py-4'>
+        <div className='text-center self-center align-middle flex justify-center'>
+          <img 
+            src="img/logo_invsort.svg" 
+            className="w-[50%] sm:w-[30%] mt-4 sb-button z-10" 
+            onClick={() => {
+              if (windowWidth > 640) {
+                setCollapsed(!collapsed);
+              } else {
+                setToggled(!toggled);
+              }
+            }} 
+            alt=""
+          />
         </div>
-        {content}
-        <div className="mt-[40px] w-full flex justify-center text-center self-center "> 
-       
-      <Sidebar  className='text-center m-auto w-full'   onBackdropClick={() => setToggled(false)} toggled={toggled} breakPoint="always" 
+        
+        <div className="mt-[40px] w-full flex justify-center">
+          <Sidebar 
+            className='text-center m-auto' 
+            onBackdropClick={() => setToggled(false)} 
+            toggled={toggled} 
+            breakPoint="all" 
           >
-      <Menu 
-        menuItemStyles={{
-          button: ({ level, active, disabled }) => {
-            // only apply styles on first level elements of the tree
-            
-            if (level === 0)
-              return {
-                color: 'rgb(255,195,118)',
-                [`&.active`]: {
-                  backgroundColor: '#B45105',
-                  color: '#b6c8d9',
+            <Menu menuItemStyles={{
+                button: ({ level, active, disabled }) => {
+                  if (level === 0) {
+                    return {
+                      color: 'rgb(255,195,118)',
+                      [`&.active`]: {
+                        backgroundColor: '#B45105',
+                        color: '#b6c8d9',
+                      },
+                      [`&:hover`]: {
+                        backgroundColor: '#3E1900'
+                      }
+                    };
+                  }
                 },
-                [`&:hover`]: {
-                  backgroundColor: '#3E1900'
-                  
-                }
-
-                
-              }
-              
-          ;},
-          
-        }}
-      className='mb-12 ' >
-        
-    <MenuItem className='MenuItem w-full poppins-semibold ' icon={<img id='carrinho'  src="/images/grocery-store.png" />} component={<Link to="/products" />}>Produtos</MenuItem>
-    <MenuItem className='MenuItem poppins-semibold ' icon={<img id='chart' className='' src="/images/pie-chart.png" />} component={<Link to="/analytics" />}>Análise </MenuItem>
-    <MenuItem className='MenuItem poppins-semibold ' icon={<img id='chart' src="/images/arrows.png" />} component={<Link to="/stockmovements" />}> Movimentações </MenuItem>
-    <MenuItem className='MenuItem poppins-semibold ' icon={<img className='' id='chart' src="/images/profile.png" />} component={<Link to="/userpage" />}> Gerenciar </MenuItem>
-  </Menu>
-  
-  <Watermark  className="bottom-0"/>
-        
-</Sidebar>
-{windowWidth > 450 ? <Sidebar id='collapse' width='14rem'  collapsedWidth='5rem ' collapsed={!collapsed}>
-<Menu 
-        menuItemStyles={{
-          button: ({ level, active, disabled }) => {
-           
-            
-            if (level === 0)
-              return {
-                color: 'rgb(255,195,118)',
-                [`&.active`]: {
-                  backgroundColor: '#B45105',
-                  color: '#b6c8d9',
+              }} className='mb-12'>
+              <MenuItem className='MenuItem poppins-semibold' icon={<img id='carrinho' src="/images/grocery-store.png" />} component={<Link to="/products" />}>Produtos</MenuItem>
+              <MenuItem className='MenuItem poppins-semibold' icon={<img id='chart' className='' src="/images/pie-chart.png" />} component={<Link to="/analytics" />}>Análise</MenuItem>
+              <MenuItem className='MenuItem poppins-semibold' icon={<img id='chart' src="/images/arrows.png" />} component={<Link to="/stockmovements" />}>Movimentações</MenuItem>
+            </Menu>
+            <Watermark className="bottom-0" />
+          </Sidebar>
+          <Sidebar width='14rem' collapsed={!collapsed}>
+            <Menu
+              menuItemStyles={{
+                button: ({ level, active, disabled }) => {
+                  if (level === 0) {
+                    return {
+                      color: 'rgb(255,195,118)',
+                      [`&.active`]: {
+                        backgroundColor: '#B45105',
+                        color: '#b6c8d9',
+                      },
+                      [`&:hover`]: {
+                        backgroundColor: '#3E1900',
+                      },
+                    };
+                  }
                 },
-                [`&:hover`]: {
-                  backgroundColor: '#3E1900',
-                  
-                }
+              }}
+              className='mb-12 w-full'
+            >
+              <MenuItem
+                className='MenuItem poppins-semibold'
+                title='Produtos'
+                icon={<img id='carrinho' alt='produtos' src="/images/grocery-store.png" />}
+                component={<Link to="/products" />}
+              >
+                Produtos
+              </MenuItem>
+              <MenuItem
+                className='MenuItem poppins-semibold'
+                title='Análise'
+                icon={<img id='chart' className='' src="/images/pie-chart.png" />}
+                component={<Link to="/analytics" />}
+              >
+                Análise
+              </MenuItem>
+              <MenuItem
+                className='MenuItem poppins-semibold'
+                title='Movimentações'
+                icon={<img id='chart' src="/images/arrows.png" />}
+                component={<Link to="/stockmovements" />}
+              >
+                Movimentações
+              </MenuItem>
+              {(role === 'admin' || role === 'gerente') && (
                 
-              }
-              
-          ;},
-        }}
-
-      className='mb-12 w-full hover:rounded-md md:hover:rounded-none' >
-
-
-    <MenuItem className='MenuItem sm:p-0 w-full poppins-semibold ' title='Produtos' icon={<img id='carrinho' alt='produtos'   src="/images/grocery-store.png" />} component={<Link to="/products" />}>{windowWidth>640?'Produtos':''}</MenuItem>
-    <MenuItem className='MenuItem sm:p-0 poppins-semibold ' title='Analise' icon={<img id='chart' className='' src="/images/pie-chart.png" />} component={<Link to="/analytics" />}>{windowWidth>640?'Analise':''} </MenuItem>
-    <MenuItem className='MenuItem  sm:p-0 poppins-semibold '  title='Movimentações' icon={<img id='chart' src="/images/arrows.png" />} component={<Link to="/stockmovements" />}> {windowWidth>640?'Movementações':''} </MenuItem>
-    <MenuItem className='MenuItem sm:p-0 poppins-semibold '  title='Gerenciar' icon={<img className='' id='chart' src="/images/profile.png" />} component={<Link to="/e-commerce" />}> {windowWidth>640?'Gerenciar':''}</MenuItem>
-
-</Menu>
-      </Sidebar> : null}
-
-          
-
-        
-
+                  <SubMenu
+                    icon={<img id='chart' src="/images/profile.png" />}
+                    className="poppins-semibold" label="Gerenciar" style={{
+                      textAlign:"center"
+                    }}
+                  >
+                    <MenuItem
+                      className='poppins-semibold'
+                      component={<Link to="/userpage" />}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6b3710'}
+                      style={{
+                        backgroundColor: '#6b3710',
+                        color: 'rgb(255,195,118)',
+                        margin: '0',
+                        border: 'none',
+                        padding: '10px',
+                        transition: 'background-color 0.3s ease',
+                        width: collapsed ? '40px' : '200px', 
+                        height: '40px',
+                      }}
+                    >
+                      {collapsed ? (
+                        'Gerenciar Usuários'
+                      ) : (
+                        <img
+                          id='user-icon'
+                          src="/images/profile.png"
+                          alt="gerenciar usuários"
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                          }}
+                        />
+                      )}
+                    </MenuItem>
+                  </SubMenu>
+              )}
+            </Menu>
+          </Sidebar>
         </div>
       </div>
     </div>
-
-    
-    {windowWidth <450 ? 
-    <div className='w-[35px] h-[33px] rounded-md border-2 border-[#6B3710] bg-[#6B3710] absolute   m-1'>
-      <img  src={'images/menu.png'} className=' object-fit w-full h-full    sb-button '  onClick={() => {if (windowWidth > 640) {
-      setCollapsed(!collapsed);
-      
-    } else {
-      setToggled(!toggled);
-      
-    }
-  }} alt="asd"/>
-    </div>: null}
-  </>
-  )
-
+  );
 }
 
 export default Sidebari;

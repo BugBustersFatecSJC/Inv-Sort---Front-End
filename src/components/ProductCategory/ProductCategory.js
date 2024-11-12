@@ -4,10 +4,10 @@ import styles from './ProductCategory.module.css'
 import api from '../../services/api'
 import Loading from '../Loading/Loading'
 import Modal from '../Modal/Modal'
-import ShortModal from '../ShortModal/ShortModal'
 import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
 import FlashMessage from '../../components/FlashMessage/FlashMessage'
+import { useNavigate } from 'react-router-dom'
 
 
 /******************************************************************************
@@ -24,7 +24,7 @@ function ProductCategory(props) {
    * Criação dos quadrados dos produtos no inventário
    */
   const [products, setProducts] = useState([]) // Aqui, em vez de `squares`, use `products`
-
+  const [windowWidth,setWindowWidth] = useState(window.innerWidth)
   const fetchProducts = async () => {
     try {
       const response = await api.get('/products')
@@ -110,20 +110,21 @@ function ProductCategory(props) {
       }
     }
 
-	/**
+ /**
      * Retorna todos os setores
     */
-	const [batch, setBatch] = useState([])
-		
-	const fetchBatch = async () => {
-		try {
-			await api
-			.get('/batch')
-			.then(response => setBatch(response.data))
-		} catch(err) {
-			console.log(err)
-		}
-	}
+   
+ const [batch, setBatch] = useState([])
+      
+ const fetchBatch = async () => {
+   try {
+     await api
+     .get('/batch')
+     .then(response => setBatch(response.data))
+   } catch(err) {
+     console.log(err)
+   }
+ }
 
     /**
      * Retorna todos os locais
@@ -153,34 +154,36 @@ function ProductCategory(props) {
         await fetchSector()
         await fetchLocals()
         await fetchBatch()
+
       }
+
       fetchData()
     }, [])
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth)
+      }
 
+      window.addEventListener('resize', handleResize)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+      }
+    })
     /**
      * Abre e fecha o modal de produtos
      */
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     const openModal = () => setIsModalOpen(true)
-    const closeModal = () => {
-      setProductName('')
-      setProductDescription('')
-      setProductUnitId('')
-      setProductSupplierId('')
-      setIsPerishable(false)
-      setProductSellValue('')
-      setProductCostValue('')
-      setProductSectorId('')
-      setProductLocalId('')
-      setProductBrand('')
-      setProductModel('')
-      setProductImage(null)
-      setProductStock('')
-      setProductStockMin('')
-      setQuantityMax('')
-      setIsModalOpen(false)
-    }
+    const closeModal = () => setIsModalOpen(false)
+
+    /**
+     * Abre e fecha o modal de categorias
+     */
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+
+    const openCategoryModal = () => setIsCategoryModalOpen(true);
+    const closeCategoryModal = () => setIsCategoryModalOpen(false);
 
     /**
      * Registra o produto
@@ -190,98 +193,59 @@ function ProductCategory(props) {
     const [productUnitId, setProductUnitId] = useState('')
     const [productSupplierId, setProductSupplierId] = useState('')
     const [isPerishable, setIsPerishable] = useState(false)
-    const [productBrand, setProductBrand] = useState('')
-    const [productModel, setProductModel] = useState('')
-    const [productCostValue, setProductCostValue] = useState('')
-    const [productSellValue, setProductSellValue] = useState('')
-    const [productLocalId, setProductLocalId] = useState('')
-    const [productSectorId, setProductSectorId] = useState('')
-    const [expirationDate, setExpirationDate] = useState('')
-    const [productImage, setProductImage] = useState(null)
-	  const [imagePreview, setImagePreview] = useState(null)
-    const [productStock, setProductStock] = useState(null)
-    const [productStockMin, setProductStockMin] = useState(null)
-    const [quantityMax, setQuantityMax] = useState(null)
+    const [productBrand, setProductBrand] = useState('');
+    const [productModel, setProductModel] = useState('');
+    const [productCostValue, setProductCostValue] = useState(0);
+    const [productSellValue, setProductSellValue] = useState(0);
+    const [productLocalId, setProductLocalId] = useState('');
+    const [productSectorId, setProductSectorId] = useState('');
+   // const [productBatchId, setProductBatchId] = useState('');
+    const [expirationDate, setExpirationDate] = useState('');
+    
 
     const handleSubmit = async(e) => {
       e.preventDefault()
 
-      const formData = new FormData();
-      formData.append('product_name', productName);
-      formData.append('description', productDescription);
-      formData.append('category_id', props.categoryKey);
-      formData.append('supplier_id', productSupplierId);
-      formData.append('is_perishable', isPerishable);
-      formData.append('unit_id', productUnitId);
-      formData.append('prod_model', productModel);
-      formData.append('prod_brand', productBrand);
-      formData.append("prod_cost_value", parseCurrencyToFloat(productCostValue));
-      formData.append("prod_sell_value", parseCurrencyToFloat(productSellValue));
-      formData.append('local_id', productLocalId);
-      formData.append('sector_id', productSectorId);
-      formData.append('product_stock', productStock);
-      formData.append('product_stock_min', productStockMin);
-      formData.append('quantity_max', quantityMax);
-      console.log(formData.data)
-      if (productImage) {
-          formData.append('product_img', productImage);
+      const ProductData = {
+          product_name: productName,
+          description: productDescription,
+          category_id: props.categoryKey,
+          supplier_id: productSupplierId,
+          is_perishable: isPerishable,
+          unit_id: productUnitId,
+          prod_model: productModel,
+          prod_brand: productBrand,
+          prod_cost_value: productCostValue,
+          prod_sell_valleu: productSellValue,
+          local_id: productLocalId,
+          sector_id: productSectorId,
+         // batch_id: productBatchId
       }
-  
+
       try {
-          await api.post("/products", formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
-              }
-          })
-          .then(response => props.onProductAdded(response.data))
-  
+          await api
+          .post("/products", ProductData)
+          .then(response => props.onProductAdded(response.data))          
+
           setProductName('')
           setProductDescription('')
           setProductUnitId('')
           setProductSupplierId('')
           setIsPerishable(false)
+          //setProductBatchId('') 
           setProductSellValue('')
           setProductCostValue('')
           setProductSectorId('')
           setProductLocalId('')
           setProductBrand('')
           setProductModel('')
-          setProductImage(null)
-          setProductStock('')
-          setProductStockMin('')
-          setQuantityMax('')
           closeModal()
           flashSuccess()
       } catch (err) {
           console.log(err)
           flashError()
       }
-    }
-
-    const formatCurrency = (value) => {
-      const formattedValue = parseFloat(value.replace(/[^\d]/g, '') / 100).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-      });
-      return formattedValue;
-    };
-
-    const parseCurrencyToFloat = (value) => {
-      return parseFloat(value.replace("R$", "").replace(".", "").replace(",", "."));
-    }
-
-    useEffect(() => {
-      if (productImage instanceof File) {
-          const previewUrl = URL.createObjectURL(productImage)
-          setImagePreview(previewUrl)
-          return () => URL.revokeObjectURL(previewUrl)
-      } else if (typeof productImage === 'string') {
-          setImagePreview(productImage)
-      } else {
-          setImagePreview(null)
-      }
-    }, [productImage])
-  
+  }
 
   /**
    * Deleta o produto
@@ -289,6 +253,7 @@ function ProductCategory(props) {
   const handleDelete = async (product_id) => {
     const user = localStorage.getItem("user")
     const jsonUser = JSON.parse(user)
+    
     if (jsonUser.role === "admin"){
     
     try {
@@ -310,30 +275,16 @@ function ProductCategory(props) {
    */
   const [isProdEditModalOpen, setIsProdEditModalOpen] = useState(false)
   const [currentProduct, setCurrentProduct] = useState(null)
-  const [tooltipKey, setTooltipKey] = useState(0)
 
   const openProdEditModal = (product) => {
     setCurrentProduct(product)
     setProductName(product.product_name)
+    setProductDescription(product.description)
     setProductUnitId(product.unit_id)
     setProductSupplierId(product.supplier_id)
-    setProductLocalId(product.supplier_id)
-    setProductSectorId(product.supplier_id)
     setIsPerishable(product.is_perishable)
-    setProductCostValue(product.prod_cost_value)
-    setProductSellValue(product.prod_sell_value)
-    setProductStock(product.product_stock)
-    setProductStockMin(product.product_stock_min)
-    setQuantityMax(product.quantity_max)
-
-
-    const imageUrl = `http://localhost:3001${product.product_img}`
-    setProductImage(imageUrl)
-    setImagePreview(imageUrl)
-
-    if (product.description === null) {
-      setProductDescription('')
-    }
+    setProductCostValue(product.prod_cost_value); 
+    setProductSellValue(product.prod_sell_value); 
 
     setIsProdEditModalOpen(true)
   }
@@ -346,46 +297,45 @@ function ProductCategory(props) {
   const handleProdUpdate = async (e) => {
     e.preventDefault()
 
-    const updatedProductData = new FormData()
-    updatedProductData.append('product_name', productName)
-    updatedProductData.append('description', productDescription)
-    updatedProductData.append('category_id', props.categoryKey)
-    updatedProductData.append('supplier_id', productSupplierId)
-    updatedProductData.append('is_perishable', isPerishable)
-    updatedProductData.append('unit_id', productUnitId)
-    updatedProductData.append('prod_model', productModel)
-    updatedProductData.append('prod_brand', productBrand)
-    updatedProductData.append("prod_cost_value", parseCurrencyToFloat(productCostValue))
-    updatedProductData.append("prod_sell_value", parseCurrencyToFloat(productSellValue))
-    updatedProductData.append('local_id', productLocalId)
-    updatedProductData.append('sector_id', productSectorId)
-    updatedProductData.append('product_stock', productStock)
-    updatedProductData.append('product_stock_min', productStockMin)
-    updatedProductData.append('quantity_max', quantityMax)
-
-    if (productImage instanceof File) {
-        updatedProductData.append('product_img', productImage)
+    const updatedProductData = {
+      product_name: productName,
+      description: productDescription,
+      category_id: props.categoryKey,
+      supplier_id: productSupplierId,
+      is_perishable: isPerishable,
+      unit_id: productUnitId,
+      prod_cost_value: productCostValue,
+      prod_sell_value: productSellValue
     }
 
+    
     try {
-        await api
-            .put(`/products/${currentProduct.product_id}`, updatedProductData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-            .then((response) => {
-              setTooltipKey((prevKey) => prevKey + 1)
-              props.onProductUpdated(currentProduct.product_id, response.data)
-              flashInfo()
-              closeProdEditModal()
-            });
-    } catch (err) {
-        console.log(err)
-        flashError()
+      await api
+        .put(`/products/${currentProduct.product_id}`, updatedProductData)
+        .then(response => console.log(response))
+        
+
+        /******************************************************************************
+         * ATEÇÃO                                                                     *
+         * TODO: Aqui está ocorrendo um erro com o react tippy (que faz o tooltip)    *
+         * e a atualização dinâmica do componente, o erro em questão é que            *
+         * o react tippy não consegue carregar código jsx depois de atualizar         *
+         * o produto, então como quebra galho após a atualizaçaõ do produto, a página *
+         * é recarregada, para mostrar as alterações                                  * 
+         * TAMBÉM ACONTECE AO EXCLUIR :(                                              *
+         ******************************************************************************/
+        // window.location.reload()
+        // props.onProductUpdated(currentProduct.product_id, updatedProductData)
+
+        closeProdEditModal()
+        flashInfo()
+    } catch(err) {
+      console.log(err)
+      flashError()
     }
   }
 
+  
   /**
    * Hover de cada produto
    */
@@ -395,51 +345,32 @@ function ProductCategory(props) {
    * Funcionalidade de abrir o container de categoria
    */
   const [showCategoryProducts, setShowCategoryProducts] = useState(false)
-
+  const id = props.categoryKey
+  const navigate = useNavigate()
   const handleClickShow = () => {
-    setShowCategoryProducts(!showCategoryProducts)
+    navigate('/buyandsell/'+id)
   }
+
 
   /**
    * Edição da categoria
    */
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
-
-  const openCategoryModal = (category) => {
-    setCategoryName(category.category_name)
-
-    const imageUrl = `http://localhost:3001${category.category_image}`
-    setCategoryImage(imageUrl)
-    setImagePreview(imageUrl)
-
-    setIsCategoryModalOpen(true)
-  }
-  const closeCategoryModal = () => {
-    setCategoryImage(null)
-    setCategoryName('')
-    setIsCategoryModalOpen(false)
-  }
-
   const [categoryName, setCategoryName] = useState('')
-  const [categoryImage, setCategoryImage] = useState(null)
 
   const handleCategoryUpdate = async(e) => {
       e.preventDefault()
 
-      const formData = new FormData();
-      formData.append('category_name', categoryName)
-      formData.append('category_image', categoryImage)
+      const categoryData = {
+          category_name: categoryName,
+      }
 
       try {
           await api
-          .put(`/category/${props.categoryKey}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          })
+          .put(`/category/${props.categoryKey}`, categoryData)
           .then(response => console.log(response))
           
-          props.onCategoryUpdated(props.categoryKey, categoryName, categoryImage)
+          props.onCategoryUpdated(props.categoryKey, categoryName)
+          setCategoryName('')
 
           closeCategoryModal()
           flashInfo()
@@ -455,7 +386,7 @@ function ProductCategory(props) {
   const handleCategoryDelete = async (category_id) => {
     const user = localStorage.getItem("user")
     const jsonUser = JSON.parse(user)
-    if (jsonUser.role === "admin"){
+    if ( jsonUser.role === "admin" || jsonUser.role === "gerente"  ){
     try {
       await api
         .delete(`/category/${category_id}`)
@@ -474,566 +405,402 @@ function ProductCategory(props) {
 
     return (
       // Container da categoria
-    <div className='w-full  rounded bg-[#5F2E09]  shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] mt-4'>
-        <div className=' p-4 mx-4 h-[100px] overflow-y-auto flex flex-wrap relative'>
-          <div className={` p-4 transition-opacity duration-200 max-h-[100px] absolute inset-0 bg-[#5F2E09]  z-30 flex justify-between  items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-          <figure className='w-[5rem] h-[5rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'>
-            {props.categoryImage ? (
-              <img
-                src={`http://localhost:3001${props.categoryImage}`}
-                alt={props.categoryName}
-                className='w-full h-full object-cover rounded-full'
-              />
-            ) : null}
-          </figure>
-            <p className='my-2 poppins-semibold text-[#EFBB7F] text-[24px]'>{ props.categoryName }</p>
-            <div className='flex justify-evenly bg-[#EFBB7F] rounded-md w-[10%]'>
-              <p className='cursor-pointer' onClick={handleClickShow}>
-                <i class="fa-solid fa-eye"></i>
-              </p>
-              <p className='cursor-pointer' onClick={() => handleCategoryDelete(props.categoryKey)}>
-                <i class="fa-solid fa-trash"></i>
-              </p>
-              <p className='cursor-pointer' onClick={() => openCategoryModal(props.category)}>
-                <i class="fa-solid fa-pencil"></i>
-              </p>
-            </div>
-          </div>
-            {/*
-              Aqui ocorre a criação de cada quadrado, é obtido uma lista com todos os produtos
-              que são mapeados, cada produto irá gerar um quadrado e cada quadrado terá sua tooltip           
-            */}
-            {props.products.map((product, index) => {
-              const unit = units.find((u) => u.unit_id === product.unit_id)?.unit_type || 'N/A'
-              return (
-                <Tooltip
-                key={`${product.product_id}-${tooltipKey}`}
-                html={(
-                  <div className={styles.myTippyTheme}>
-                    <strong>Nome:</strong> {product.product_name}<br />
-                    <strong>Unidade:</strong> {unit}<br />
-                    <strong>Perecível:</strong> {product.is_perishable ? 'Sim' : 'Não'}
-                  </div>
-                )}
-                title={product.product_name}
-                arrow={true}
-                theme='dark'
-                delay={20}
-                trigger='mouseenter'
-              >
-                <div key={index} className={`relative w-12 h-12 mb-4 bg-transparent border-l-[3px] border-b-[3px] border-[#FFE4A1] cursor-pointer ${styles.borderDepth}`} id={product.product_id} onMouseEnter={() => setHoveredProductId(product.product_id)}
-                onMouseLeave={() => setHoveredProductId(null)}
-                onClick={() => openProdEditModal(product)}
-                >
-                {hoveredProductId === product.product_id && (
-                  <i 
-                    className="fa-solid fa-trash absolute top-[-10px] right-[-5px] text-red-500 cursor-pointer" 
-                    onClick={() => handleDelete(product.product_id)}
-                  ></i>
-                )}
-                </div>
-              </Tooltip>
-              )
-            })}
 
-            {/* Botão para adicionar novo produto */}
-            <button
-                onClick={openModal}
-                className="w-12 h-12 alt-color-4-bg border-[3px] border-[#D87B26] flex items-center justify-center text-2xl"
-            >
-            <i class="fa-solid fa-plus"></i>
-            </button>
+        <div className='w-[100%] my-2 mx-auto g  bg-[#5F2E09] rounded-md hover:bg-[#3E1900] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] mt-1 h-[200px]  mx-4 flex relative'>
+          <div className={`  transition-opacity duration-200 rounded-md  w-full  bg-[#5F2E09] flex justify-center  items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="flex flex-col justify-center flex-wrap w-full  "> 
+            <figure className='w-[4rem] mx-auto h-[4rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'>
+              {props.categoryImage ? (
+                <img
+                  src={`http://localhost:3001${props.categoryImage}`}
+                  alt={props.categoryName}
+                  className='w-full h-full object-cover rounded-full'
+                />
+              ) : null}
+            </figure>
+            
+            <div className="flex flex-col w-[100%] h-full text-ellipsis text-wrap text-center justify-center mx-auto ">
+              
+                <p className={`my-2  mx-auto px-1 poppins-semibold  ${windowWidth > 450?'text-[15px]  ':'text-[13px]'} w-full  text-center`} style={{ color: "var(--tertiary-color)" }}>
+                  {props.categoryName}
+                </p>
+                
+              
+              <div className="flex justify-center rounded-md w-[100%] mt-4 mx-auto  poppins-medium mx-auto">
+                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={handleClickShow} style={{ color: "var(--tertiary-color)" }}>
+                  <i className="fa-solid fa-eye"></i>
+                  
+                </p>
+                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => handleCategoryDelete(props.categoryKey)} style={{ color: "var(--tertiary-color)" }}>
+                  <i className="fa-solid fa-trash"></i>
+                  
+                </p>
+                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={openProdEditModal} style={{ color: "var(--tertiary-color)" }}>
+                  <i className="fa-solid fa-pencil"></i>
+                  
+                </p>
+              </div>
+            </div>
+
+
+            </div>
+     
         </div>
 
             
 
-    {/* Modal de produto */}
-		{isModalOpen && (
-			<Modal closeModal={closeModal} title="Adicionar novo produto" handleSubmit={handleSubmit}>
-				<div className='flex justify-between modal-main-container'>
-					<div className='w-[20%]'>
-						<div
-							className="bg-[#FFC376] p-[1rem] h-[14rem] w-[14rem] flex items-center justify-center border-8 border-[#D87B26] cursor-pointer mt-4 shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] relative"
-							onClick={() => document.getElementById('product-image-input').click()}
-						>
-							<input
-								type="file"
-								id="product-image-input"
-								className="hidden"
-								onChange={(e) => {
-									setProductImage(e.target.files[0]);
-								}}
-								name="product-image"
-							/>
-							<i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
+        {/* Modal de produto */}
+        {isModalOpen && (
+  <div className="modal modal-open text-slate-400 ">
+    <div className="modal-box">
+      <h3 className="font-bold text-lg text-white">Adicionar novo produto</h3>
 
-							{imagePreview && (
-								<div className="mt-4">
-									<img src={imagePreview} alt="preview da imagem" className="w-full h-full z-0 absolute object-cover inset-0" />
-								</div>
-							)}
-						</div>
-					</div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Nome do produto</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Digite o nome do produto"
+            className="input input-bordered placeholder:text-slate-300"
+            required
+            name='product_name'
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+          />
+        </div>
 
-					<div className='w-[38%]'>
-						<input type="hidden" value={props.categoryKey} />
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Descrição (Opcional)</span>
+          </label>
+          <textarea
+            placeholder="Digite a descrição do produto"
+            className="textarea textarea-bordered"
+            name='description'
+            value={productDescription}
+            onChange={(e) => setProductDescription(e.target.value)}
+          ></textarea>
+        </div>
 
-						<div className="form-control mb-4 w-full">
-							<label className="label">
-							<span className="label-text alt-color-5">Nome do produto</span>
-							</label>
-							<input
-							type="text"
-							placeholder="Digite o nome do produto"
-							className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-							required
-							name='product_name'
-							value={productName}
-							onChange={(e) => setProductName(e.target.value)}
-							/>
-						</div>
+        <input type="hidden" value={props.categoryKey} />
 
-						<div className="form-control mb-4">
-							<label className="label">
-							<span className="label-text alt-color-5">Unidade</span>
-							</label>
-							<select
-							value={productUnitId}
-							onChange={(e) => setProductUnitId(parseInt(e.target.value))}
-							className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-							>
-							<option disabled value="">Selecionar unidade</option>
-							{units.map((unit) => (
-								<option key={unit.unit_id} value={unit.unit_id}>{unit.unit_type}</option>
-							))}
-							</select>
-						</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Unidade</span>
+          </label>
+          <select
+            value={productUnitId}
+            onChange={(e) => setProductUnitId(parseInt(e.target.value))}
+            className="select select-bordered"
+          >
+            <option disabled value="">Selecionar unidade</option>
+            {units.map((unit) => (
+              <option key={unit.unit_id} value={unit.unit_id}>{unit.unit_type}</option>
+            ))}
+          </select>
+        </div>
 
-						<div className="form-control mb-4">
-							<label className="label">
-							<span className="label-text alt-color-5">Fornecedor</span>
-							</label>
-							<select
-							value={productSupplierId}
-							onChange={(e) => setProductSupplierId(parseInt(e.target.value))}
-							className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-							>
-							<option disabled value="">Selecionar fornecedor</option>
-							{suppliers.map((supplier) => (
-								<option key={supplier.supplier_id} value={supplier.supplier_id}>{supplier.supplier_name}</option>
-							))}
-							</select>
-						</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Fornecedor</span>
+          </label>
+          <select
+            value={productSupplierId}
+            onChange={(e) => setProductSupplierId(parseInt(e.target.value))}
+            className="select select-bordered"
+          >
+            <option disabled value="">Selecionar fornecedor</option>
+            {suppliers.map((supplier) => (
+              <option key={supplier.supplier_id} value={supplier.supplier_id}>{supplier.supplier_name}</option>
+            ))}
+          </select>
+        </div>
 
-						<div className='flex justify-between preco-container'>
-							<div className="form-control mb-4">
-								<label className="label">
-								<span className="label-text alt-color-5">Preço de Custo</span>
-								</label>
-								<input
-								type="text"
-								placeholder="Digite o preço de custo"
-								className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-								required
-								name='cost_price'
-								value={productCostValue}
-								onChange={(e) => setProductCostValue(formatCurrency(e.target.value))} 
-								/>
-							</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Preço de Custo</span>
+          </label>
+          <input
+            type="number"
+            placeholder="Digite o preço de custo"
+            className="input input-bordered placeholder:text-slate-300"
+            required
+            name='cost_price'
+            value={productCostValue}
+            onChange={(e) => setProductCostValue(parseFloat(e.target.value) || 0)} 
+          />
+        </div>
 
-							<div className="form-control mb-4">
-								<label className="label">
-								<span className="label-text alt-color-5">Preço de Venda</span>
-								</label>
-								<input
-								type="text"
-								placeholder="Digite o preço de venda"
-								className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-								required
-								name='sell_price'
-								value={productSellValue}
-								onChange={(e) => setProductSellValue(formatCurrency(e.target.value))} 
-								/>
-							</div>
-						</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Preço de Venda</span>
+          </label>
+          <input
+            type="number"
+            placeholder="Digite o preço de venda"
+            className="input input-bordered placeholder:text-slate-300"
+            required
+            name='sell_price'
+            value={productSellValue}
+            onChange={(e) => setProductSellValue(parseFloat(e.target.value) || 0)} 
+          />
+        </div>
 
-						<div className="form-control mb-4 w-full">
-							<label className="cursor-pointer label">
-							<span className="label-text alt-color-5">É perecível</span>
-							<input
-								type="checkbox"
-								className="toggle toggle-primary bg-[#F8B971] checked:bg-[#B45105] checked:border-[#F8B971] rounded-[5px]"
-								checked={isPerishable}
-								onChange={(e) => setIsPerishable(e.target.checked)}
-							/>
-							</label>
-						</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Local</span>
+          </label>
+          <select
+            value={productLocalId}
+            onChange={(e) => setProductLocalId(parseInt(e.target.value))}
+            className="select select-bordered"
+          >
+            <option disabled value="">Selecionar local</option>
+            {local.map((local) => (
+              <option key={local.local_id} value={local.local_id}>{local.local_name}</option>
+            ))}
+          </select>
+        </div>
 
-						{isPerishable && (
-							<div className="form-control mb-4">
-								<label className="label">
-								<span className="label-text alt-color-5">Data de Validade</span>
-								</label>
-								<input
-								type="date"
-								className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-								name="expiration_date"
-								value={expirationDate}
-								onChange={(e) => setExpirationDate(e.target.value)}
-								/>
-							</div>
-						)}
-					</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Setor</span>
+          </label>
+          <select
+            value={productSectorId}
+            onChange={(e) => setProductSectorId(parseInt(e.target.value))}
+            className="select select-bordered"
+          >
+            <option disabled value="">Selecionar setor</option>
+            {sectors.map((sector) => (
+              <option key={sector.sector_id} value={sector.sector_id}>{sector.sector_name}</option>
+            ))}
+          </select>
+        </div>
+{/* 
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Lotes</span>
+          </label>
+          <select
+            value={productBatchId || ""}
+            onChange={(e) => setProductBatchId(parseInt(e.target.value))}
+            className="select select-bordered"
+          >
+            <option disabled value="">Selecionar lote</option>
+            {batch.map((batch) => (
+              <option key={batch.batch_id} value={batch.batch_id}>{batch.batch_id}</option>
+              
+            ))}
+          </select>
+        </div> */}
 
-					<div className='w-[38%]'>
-						<div className="form-control mb-4">
-							<label className="label">
-							<span className="label-text alt-color-5">Local</span>
-							</label>
-							<select
-							value={productLocalId}
-							onChange={(e) => setProductLocalId(parseInt(e.target.value))}
-							className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-							>
-							<option disabled value="">Selecionar local</option>
-							{local.map((local) => (
-								<option key={local.local_id} value={local.local_id}>{local.local_name}</option>
-							))}
-							</select>
-						</div>
+        <div className="form-control mb-4">
+          <label className="cursor-pointer label">
+            <span className="label-text text-white">É perecível</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-primary"
+              checked={isPerishable}
+              onChange={(e) => setIsPerishable(e.target.checked)}
+            />
+          </label>
+        </div>
 
-						<div className="form-control mb-4">
-							<label className="label">
-							<span className="label-text alt-color-5">Setor</span>
-							</label>
-							<select
-							value={productSectorId}
-							onChange={(e) => setProductSectorId(parseInt(e.target.value))}
-							className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-							>
-							<option disabled value="">Selecionar setor</option>
-							{sectors.map((sector) => (
-								<option key={sector.sector_id} value={sector.sector_id}>{sector.sector_name}</option>
-							))}
-							</select>
-						</div>
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text text-white">Data de Validade</span>
+          </label>
+          <input
+            type="date"
+            className="input input-bordered placeholder:text-slate-300"
+            name="expiration_date"
+            value={expirationDate}
+            onChange={(e) => setExpirationDate(e.target.value)}
+            disabled={!isPerishable}
+          />
+        </div>
 
-						<div className="form-control mb-4">
-							<label className="label">
-								<span className="label-text alt-color-5">Estoque</span>
-							</label>
-							<div className='flex justify-between'>
-								<input
-									type="text"
-									className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-									name="expiration_date"
-									value={productStockMin}
-									placeholder='Mínimo'
-                  required
-									onChange={(e) => setProductStockMin(e.target.value.replace(/\D/g, ''))}
-								/>
-								<input
-									type="text"
-									className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-									name="expiration_date"
-									value={productStock}
-									placeholder='Atual'
-                  required
-									onChange={(e) => setProductStock(e.target.value.replace(/\D/g, ''))}
-								/>
-								<input
-									type="text"
-									className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-									name="expiration_date"
-									value={quantityMax}
-									placeholder='Máximo'
-                  required
-									onChange={(e) => setQuantityMax(e.target.value.replace(/\D/g, ''))}
-								/>
-							</div>
+        <div className="modal-action">
+          <label htmlFor="product-modal" className="btn" onClick={closeModal}>Cancelar</label>
+          <button type="submit" className="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
 
-							<div className="form-control mb-4 mt-4 w-full">
-								<label className="label ">
-								<span className="label-text alt-color-5">Descrição (Opcional)</span>
-								</label>
-								<textarea
-								placeholder="Digite a descrição do produto"
-								className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 placeholder-color"
-								name='description'
-								value={productDescription}
-								onChange={(e) => setProductDescription(e.target.value)}
-								></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-			</Modal>
-		)}
 
-      {/* Modal para editar produto */}
-      {isProdEditModalOpen && (
-        <Modal closeModal={closeProdEditModal} title="Editar Produto" handleSubmit={handleProdUpdate}>
-            <div className='flex justify-between modal-main-container'>
-              <div className='w-[20%]'>
-                <div
-                  className="bg-[#FFC376] p-[1rem] h-[14rem] w-[14rem] flex items-center justify-center border-8 border-[#D87B26] cursor-pointer mt-4 shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] relative"
-                  onClick={() => document.getElementById('product-image-input').click()}
-                >
-                  <input
-                    type="file"
-                    id="product-image-input"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files[0]
-                      if (file) {
-                        setProductImage(file)
-                        setImagePreview(URL.createObjectURL(file))
-                      }
-                    }}
-                    name="product-image"
-                  />
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="preview da imagem" className="w-full h-full z-0 absolute object-cover inset-0" />
-                  ) : (
-                    <i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
-                  )}
-                </div>
-              </div>
+{/* Modal para editar produto */}
+{isProdEditModalOpen && (
+  <Modal closeModal={closeProdEditModal} title="Editar Produto" handleSubmit={handleProdUpdate}>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Nome do produto</span>
+      </label>
+      <input 
+        type="text" 
+        placeholder="Digite o nome do produto" 
+        className="input input-bordered placeholder:text-slate-300" 
+        required 
+        name='product_name' 
+        value={productName} 
+        onChange={(e) => setProductName(e.target.value)} 
+      />
+    </div>
 
-              <div className='w-[38%]'>
-                <input type="hidden" value={props.categoryKey} />
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Descrição (Opcional)</span>
+      </label>
+      <textarea 
+        placeholder="Digite a descrição do produto" 
+        className="textarea textarea-bordered" 
+        name='description' 
+        value={productDescription} 
+        onChange={(e) => setProductDescription(e.target.value)}
+      />
+    </div>
 
-                <div className="form-control mb-4 w-full">
-                  <label className="label">
-                  <span className="label-text alt-color-5">Nome do produto</span>
-                  </label>
-                  <input
-                  type="text"
-                  placeholder="Digite o nome do produto"
-                  className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                  required
-                  name='product_name'
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  />
-                </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Unidade</span>
+      </label>
+      <select 
+        value={productUnitId} 
+        onChange={(e) => setProductUnitId(parseInt(e.target.value))} 
+        className="select select-bordered"
+      >
+        <option disabled value="">Selecionar unidade</option>
+        {units.map((unit) => (
+          <option key={unit.unit_id} value={unit.unit_id}>{unit.unit_type}</option>
+        ))}
+      </select>
+    </div>
 
-                <div className="form-control mb-4">
-                  <label className="label">
-                  <span className="label-text alt-color-5">Unidade</span>
-                  </label>
-                  <select
-                  value={productUnitId}
-                  onChange={(e) => setProductUnitId(parseInt(e.target.value))}
-                  className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                  >
-                  <option disabled value="">Selecionar unidade</option>
-                  {units.map((unit) => (
-                    <option key={unit.unit_id} value={unit.unit_id}>{unit.unit_type}</option>
-                  ))}
-                  </select>
-                </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Fornecedor</span>
+      </label>
+      <select 
+        value={productSupplierId} 
+        onChange={(e) => setProductSupplierId(parseInt(e.target.value))} 
+        className="select select-bordered"
+      >
+        <option disabled value="">Selecionar fornecedor</option>
+        {suppliers.map((supplier) => (
+          <option key={supplier.supplier_id} value={supplier.supplier_id}>{supplier.supplier_name}</option>
+        ))}
+      </select>
+    </div>
 
-                <div className="form-control mb-4">
-                  <label className="label">
-                  <span className="label-text alt-color-5">Fornecedor</span>
-                  </label>
-                  <select
-                  value={productSupplierId}
-                  onChange={(e) => setProductSupplierId(parseInt(e.target.value))}
-                  className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                  >
-                  <option disabled value="">Selecionar fornecedor</option>
-                  {suppliers.map((supplier) => (
-                    <option key={supplier.supplier_id} value={supplier.supplier_id}>{supplier.supplier_name}</option>
-                  ))}
-                  </select>
-                </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Preço de Custo</span>
+      </label>
+      <input 
+        type="number" 
+        placeholder="Digite o preço de custo" 
+        className="input input-bordered placeholder:text-slate-300" 
+        required 
+        name='cost_price' 
+        value={productCostValue} 
+        onChange={(e) => setProductCostValue(parseFloat(e.target.value) || 0)} 
+      />
+    </div>
 
-                <div className='flex justify-between preco-container'>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                    <span className="label-text alt-color-5">Preço de Custo</span>
-                    </label>
-                    <input
-                    type="text"
-                    placeholder="Digite o preço de custo"
-                    className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                    required
-                    name='cost_price'
-                    value={productCostValue}
-                    onChange={(e) => setProductCostValue(formatCurrency(e.target.value))} 
-                    />
-                  </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Preço de Venda</span>
+      </label>
+      <input 
+        type="number" 
+        placeholder="Digite o preço de venda" 
+        className="input input-bordered placeholder:text-slate-300" 
+        required 
+        name='sell_price' 
+        value={productSellValue} 
+        onChange={(e) => setProductSellValue(parseFloat(e.target.value) || 0)} 
+      />
+    </div>
 
-                  <div className="form-control mb-4">
-                    <label className="label">
-                    <span className="label-text alt-color-5">Preço de Venda</span>
-                    </label>
-                    <input
-                    type="text"
-                    placeholder="Digite o preço de venda"
-                    className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                    required
-                    name='sell_price'
-                    value={productSellValue}
-                    onChange={(e) => setProductSellValue(formatCurrency(e.target.value))} 
-                    />
-                  </div>
-                </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Local</span>
+      </label>
+      <select 
+        value={productLocalId} 
+        onChange={(e) => setProductLocalId(parseInt(e.target.value))} 
+        className="select select-bordered"
+      >
+        <option disabled value="">Selecionar local</option>
+        {local.map((local) => (
+          <option key={local.local_id} value={local.local_id}>{local.local_name}</option>
+        ))}
+      </select>
+    </div>
 
-                <div className="form-control mb-4 w-full">
-                  <label className="cursor-pointer label">
-                  <span className="label-text alt-color-5">É perecível</span>
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary bg-[#F8B971] checked:bg-[#B45105] checked:border-[#F8B971] rounded-[5px]"
-                    checked={isPerishable}
-                    onChange={(e) => setIsPerishable(e.target.checked)}
-                  />
-                  </label>
-                </div>
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Setor</span>
+      </label>
+      <select 
+        value={productSectorId} 
+        onChange={(e) => setProductSectorId(parseInt(e.target.value))} 
+        className="select select-bordered"
+      >
+        <option disabled value="">Selecionar setor</option>
+        {sectors.map((sector) => (
+          <option key={sector.sector_id} value={sector.sector_id}>{sector.sector_name}</option>
+        ))}
+      </select>
+    </div>
 
-                {isPerishable && (
-                  <div className="form-control mb-4">
-                    <label className="label">
-                    <span className="label-text alt-color-5">Data de Validade</span>
-                    </label>
-                    <input
-                    type="date"
-                    className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                    name="expiration_date"
-                    value={expirationDate}
-                    onChange={(e) => setExpirationDate(e.target.value)}
-                    />
-                  </div>
-                )}
-              </div>
+    {/* <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Lotes</span>
+      </label>
+      <select 
+        value={productBatchId || ""} 
+        onChange={(e) => setProductBatchId(parseInt(e.target.value))} 
+        className="select select-bordered"
+      >
+        <option disabled value="">Selecionar lote</option>
+        {batch.map((batch) => (
+          <option key={batch.batch_id} value={batch.batch_id}>{batch.batch_id}</option>
+        ))}
+      </select>
+    </div> */}
 
-              <div className='w-[38%]'>
-                <div className="form-control mb-4">
-                  <label className="label">
-                  <span className="label-text alt-color-5">Local</span>
-                  </label>
-                  <select
-                  value={productLocalId}
-                  onChange={(e) => setProductLocalId(parseInt(e.target.value))}
-                  className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                  >
-                  <option disabled value="">Selecionar local</option>
-                  {local.map((local) => (
-                    <option key={local.local_id} value={local.local_id}>{local.local_name}</option>
-                  ))}
-                  </select>
-                </div>
+    <div className="form-control mb-4">
+      <label className="cursor-pointer label">
+        <span className="label-text text-white">É perecível</span>
+        <input 
+          type="checkbox" 
+          className="toggle toggle-primary" 
+          checked={isPerishable} 
+          onChange={(e) => setIsPerishable(e.target.checked)} 
+        />
+      </label>
+    </div>
 
-                <div className="form-control mb-4">
-                  <label className="label">
-                  <span className="label-text alt-color-5">Setor</span>
-                  </label>
-                  <select
-                  value={productSectorId}
-                  onChange={(e) => setProductSectorId(parseInt(e.target.value))}
-                  className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                  >
-                  <option disabled value="">Selecionar setor</option>
-                  {sectors.map((sector) => (
-                    <option key={sector.sector_id} value={sector.sector_id}>{sector.sector_name}</option>
-                  ))}
-                  </select>
-                </div>
-
-                <div className="form-control mb-4">
-                  <label className="label">
-                    <span className="label-text alt-color-5">Estoque</span>
-                  </label>
-                  <div className='flex justify-between'>
-                    <input
-                      type="text"
-                      className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-                      name="expiration_date"
-                      value={productStockMin}
-                      placeholder='Mínimo'
-                      onChange={(e) => setProductStockMin(e.target.value.replace(/\D/g, ''))}
-                    />
-                    <input
-                      type="text"
-                      className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-                      name="expiration_date"
-                      value={productStock}
-                      placeholder='Atual'
-                      onChange={(e) => setProductStock(e.target.value.replace(/\D/g, ''))}
-                    />
-                    <input
-                      type="text"
-                      className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 w-[30%] placeholder-color"
-                      name="expiration_date"
-                      value={quantityMax}
-                      placeholder='Máximo'
-                      onChange={(e) => setQuantityMax(e.target.value.replace(/\D/g, ''))}
-                    />
-                  </div>
-                  <div className="form-control mb-4 mt-4 w-full">
-                    <label className="label ">
-                    <span className="label-text alt-color-5">Descrição (Opcional)</span>
-                    </label>
-                    <textarea
-                    placeholder="Digite a descrição do produto"
-                    className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5 placeholder-color"
-                    name='description'
-                    value={productDescription}
-                    onChange={(e) => setProductDescription(e.target.value)}
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Modal>
-        )}
-
-      {/* Modal de edição de categoria */}
-      {isCategoryModalOpen && (
-        <ShortModal
-            title="Editar categoria"
-            handleSubmit={handleCategoryUpdate}
-            modalName="editar-categoria"
-            closeModal={closeCategoryModal}
-        >
-            <div className='w-full flex flex-col items-center mt-4 '>
-              <label className='label'>Imagem da categoria</label>
-              <div
-                className="bg-[#FFC376] p-[1rem] h-[14rem] w-[14rem] flex items-center justify-center border-8 border-[#D87B26] cursor-pointer shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] relative"
-                onClick={() => document.getElementById('category-image-input').click()}
-              >
-                <input
-                  type="file"
-                  id="category-image-input"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files[0]
-                    if (file) {
-                      setCategoryImage(file)
-                      setImagePreview(URL.createObjectURL(file))
-                    }
-                  }}
-                  name="category-image"
-                />
-                {imagePreview ? (
-                  <img src={imagePreview} alt="preview da imagem" className="w-full h-full z-0 absolute object-cover inset-0" />
-                ) : (
-                  <i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
-                )}
-              </div>
-            </div>
-
-            <div className="form-control mb-4">
-                <label className="label">
-                    <span className="label-text alt-color-5">Nome da categoria</span>
-                </label>
-                <input type="text" placeholder="Digite o nome da categoria" className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5" required value={categoryName} onChange={(e) => setCategoryName(e.target.value)} name='category-name' />
-            </div>
-        </ShortModal>
-      )}
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text text-white">Data de Validade</span>
+      </label>
+      <input 
+        type="date" 
+        className="input input-bordered placeholder:text-slate-300" 
+        name="expiration_date" 
+        value={expirationDate} 
+        onChange={(e) => setExpirationDate(e.target.value)} 
+        disabled={!isPerishable} 
+      />
+    </div>
+  </Modal>
+)}
 
       {/* Componente flash message, verifica se o estado flash é true e então renderiza a flash message */}
       {flash && (

@@ -186,11 +186,9 @@ function ProductTableMvSt() {
         >
           Próxima
         </button>
-
       </div>
 
       {isModalOpen && selectedMovement && (
-
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
           <div className="bg-[#6B3710] p-6 rounded-lg max-w-4xl w-full">
             <h2 className="text-xl font-bold mb-4 text-white">Detalhes da Movimentação</h2>
@@ -212,8 +210,6 @@ function ProductTableMvSt() {
           </div>
         </div>
       )}
-    </div>
-
     </div>
 
   );

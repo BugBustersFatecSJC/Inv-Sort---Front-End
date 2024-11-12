@@ -26,7 +26,7 @@ function UserProfileIcon() {
 
       <div className='me-3 flex flex-col justify-end text-end mr-4'> 
         <p className='poppins-medium text-xl'>
-          {jsonUser.username}
+          {user.username}
 
         </p>
         <div className="flex justify-between">

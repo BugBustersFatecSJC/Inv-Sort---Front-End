@@ -26,16 +26,18 @@ const UserPage = () => {
   }, []); 
 
   const handleSearch = (query) => {
-    const foundUser = users.find(u => u.username.toLowerCase() === query.toLowerCase());
-    if (query === '') {
+    if (!query.trim()) {
       setError('Digite um nome de usuário');
-    } else if (foundUser) {
+      setUser(null);
+      return;
+    }
+
+    const foundUser = users.find(u => u.username.toLowerCase() === query.toLowerCase().trim());
+    if (foundUser) {
       setUser(foundUser);
-      setUsers([]);
       setError('');
     } else {
       setUser(null);
-      fetchUsers(); 
       setError('Usuário não encontrado!');
     }
   };
@@ -44,6 +46,7 @@ const UserPage = () => {
     api.delete(`/users/${userId}`)
       .then(() => {
         setUsers(users.filter(u => u.user_id !== userId));
+        if (user && user.user_id === userId) setUser(null); // Limpa o usuário se deletado
       })
       .catch(err => {
         setError('Erro ao deletar usuário');
@@ -63,21 +66,22 @@ const UserPage = () => {
               <SearchBar onSearch={handleSearch} />
             </div>
             {error && <p className="text-red-500 mt-4">{error}</p>}
-            {user && (
-              <UserDetails 
+            {user ? (
+              <UserDetails
                 user={user}
                 onUserRoleChange={handleRoleChange}
                 onDelete={handleDelete}
               />
+            ) : (
+              users.map(user => (
+                <UserDetails 
+                  key={user.user_id} 
+                  user={user}
+                  onUserRoleChange={handleRoleChange}
+                  onDelete={handleDelete}
+                />
+              ))
             )}
-            {users.map(user => (
-              <UserDetails 
-                key={user.user_id} 
-                user={user}
-                onUserRoleChange={handleRoleChange}
-                onDelete={handleDelete}
-              />
-            ))}
           </section>
         </div>
       </div>

@@ -169,7 +169,7 @@ function Sector() {
                   <div className='font-pixel flex space-x-6 border-4 border-[#B45105] p-3'>
                     <h3>Local: {local.local_name}</h3>
                     <p>Endereço: {local.local_address}</p>
-                    <button onClick={() => openEditLocalModal(local)} className='font-pixel bg-[#362010] border-4 border-black text-[#F4BD76]'>Editar Local</button>
+                    <button onClick={() => console.log(local)} className='font-pixel bg-[#362010] border-4 border-black text-[#F4BD76]'>Editar Local</button>
                     <button onClick={() => openDeleteModalLocal(local)} className='font-pixel bg-[#362010] border-4 border-black text-[#F4BD76]'>Excluir Local</button>
                     <h4>Setores:</h4>
                     <ul>
