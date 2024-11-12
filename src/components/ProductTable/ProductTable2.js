@@ -5,6 +5,8 @@ import api from '../../services/api';
 import SearchBar from '../SearchBar/SearchBar';
 import { useParams } from 'react-router-dom';
 import ProductCell from '../ProductCell/ProductCell';
+import Modal from '../Modal/Modal'
+
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
@@ -67,6 +69,30 @@ const ProductTable = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filtrado.slice(indexOfFirstItem, indexOfLastItem);
+  
+  class Compra{
+    constructor(id,buyorsell,quantity,validade,maximo){
+      this.id=id
+      this.buyorsell=buyorsell
+      this.quantity=quantity
+      this.validade=validade
+      this.maximo=maximo
+  }}
+
+  const handleProductClick = (product) => {
+    let novaCompra = new Compra (product.product_id,
+      prompt("Digite buy-Para Comprar/sell-Para Vender"),
+      parseInt(prompt("Quantidade a ser modificada:")),
+      prompt("Insira a data de Validade YYYY/MM/DD"),
+      parseInt(prompt("Quantidade Maxima:")))
+
+    console.log("Produto clicado:", novaCompra);
+
+    let url =`http://localhost:3001/buyandsell/${novaCompra.buyorsell}/${novaCompra.id}`
+    api.post(url,novaCompra)
+
+    alert('LIBERDADE!!!!!')
+  };
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -82,7 +108,7 @@ const ProductTable = () => {
       <SearchBar handlesSearch={handleSearch} />
       <div className="flex grid mt-4 overflow-y-auto grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center justify-center flex-wrap gap-2 p-1">
         {currentItems.map((product, index) => (
-          <ProductCell product={product} key={index} />
+          <ProductCell product={product} key={index} onClick={handleProductClick} />
         ))}
       </div>
 
