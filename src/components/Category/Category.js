@@ -1,30 +1,52 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import FlashMessage from '../../components/FlashMessage/FlashMessage'
-import ShortModal from '../ShortModal/ShortModal'
-import './Category.css'
 import Modal from '../Modal/Modal'
 import './Category.css'
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
-function Category(props) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [categoryName, setCategoryName] = useState('');
-    const [nameError, setNameError] = useState(null);
-    const [flash, setFlash] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
 
-    const openModal = () => setIsModalOpen(true);
+function Category(props) {
+    /**
+     * Lógica para o modal
+     */
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [categoryName, setCategoryName] = useState('')
+    const [categoryImage, setCategoryImage] = useState(null)
+    const [imagePreview, setImagePreview] = useState(null)
+    const [nameError, setNameError] = useState(null)
+
+    const openModal = () => setIsModalOpen(true)
     const closeModal = () => {
-        setIsModalOpen(false);
-        setCategoryName('');
-        setImagePreview(null);
-        setNameError(null);
+        setIsModalOpen(false)
+        setCategoryName('')
+        setCategoryImage(null)
+        setNameError(null)
+    }
+
+    const [imageSrc, setImageSrc] = useState(null); // Imagem original carregada
+    const [croppedImage, setCroppedImage] = useState(null); // Imagem recortada
+    const [cropper, setCropper] = useState(null); // Instância do Cropper
+
+
+    /**
+     * Renderização da flash message
+     */
+    const [flash, setFlash] = useState(null)
+
+    const flashSuccess = () => {
+        setFlash({ message: 'Item adicionado com sucesso!', type: 'success' });
+    }
+
+    const flashError = () => {
+        setFlash({ message: 'Um erro aconteceu', type: 'error' });
     };
 
-    const flashSuccess = () => setFlash({ message: 'Item adicionado com sucesso!', type: 'success' });
-    const flashError = () => setFlash({ message: 'Um erro aconteceu', type: 'error' });
+    const flashInfo = () => {
+        setFlash({ message: 'Item atualizado', type: 'info' });
+    }
+
     const flashDelete = () => {
         setFlash({ message: 'Item deletado', type: 'success' });
     }
@@ -32,84 +54,60 @@ function Category(props) {
     /**
      * Form para enviar os dados da categoria
      */
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
     
-    //     if (!cropper) return;
+        if (!cropper) return;
     
-    //     // Obtém a imagem recortada em Blob
-    //     cropper.getCroppedCanvas().toBlob((blob) => {
-    //         const formData = new FormData();
-    //         formData.append("category_name", categoryName);
-    //         formData.append("category_image", blob, "category_image.png");
-    //         console.log(blob)
+        // Obtém a imagem recortada em Blob
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            const formData = new FormData();
+            formData.append("category_name", categoryName);
+            formData.append("category_image", blob, "category_image.png");
+            console.log(blob)
     
-    //         try {
-    //             api
-    //                 .post("/category", formData, {
-    //                     headers: { "Content-Type": "multipart/form-data" },
-    //                 })
-    //                 .then((response) => props.onCategoryAdded(response.data));
+            try {
+                api
+                    .post("/category", formData, {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    })
+                    .then((response) => props.onCategoryAdded(response.data));
     
-    //             setCategoryName("");
-    //             setCategoryImage(null);
-    //             setImageSrc(null);
-    //             setCroppedImage(null);
-    //             closeModal();
-    //             flashSuccess();
-    //         } catch (err) {
-    //             console.log(err);
-    //             flashError();
-    //         }
-    //     });
-    // };
+                setCategoryName("");
+                setCategoryImage(null);
+                setImageSrc(null);
+                setCroppedImage(null);
+                closeModal();
+                flashSuccess();
+            } catch (err) {
+                console.log(err);
+                flashError();
+            }
+        });
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImageSrc(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.append("category_name", categoryName);
-        if (imagePreview) {
-            const response = await fetch(imagePreview);
-            const blob = await response.blob();
-            formData.append("category_image", blob, "category_image.png");
-        }
-
-        try {
-            const response = await api.post("/category", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            props.onCategoryAdded(response.data);
-            closeModal();
-            flashSuccess();
-        } catch (err) {
-            console.error(err);
-            if (err.response?.status === 400 && err.response.data.error.code === 'P2002') {
-                setNameError("Esta categoria já existe");
-            }
-            flashError();
-        }
-    };
-
+    }
+    
     return (
         <>
-            <div onClick={openModal} className='w-full alt-color-6-bg rounded shadow-md mt-4 mb-[40px] cursor-pointer'>
+            <div onClick={openModal} className='w-full alt-color-2-bg rounded shadow-md mt-4 mb-[40px] cursor-pointer'>
                 <div className='p-[1rem] h-[200px] flex flex-col items-center justify-center'>
-                    <i className="fa-solid fa-plus text-4xl"></i>
+                    <i class="fa-solid fa-plus text-4xl"></i>
                     <p className='mt-4'>Adicionar categoria</p>
                 </div>
             </div>
 
             {isModalOpen && (
-                <ShortModal
+                <Modal
                     title="Criar categoria"
                     handleSubmit={handleSubmit}
                     modalName="cria-categoria"
@@ -128,35 +126,34 @@ function Category(props) {
                             onChange={(e) => setCategoryName(e.target.value)}
                             name="category-name"
                         />
-                        {nameError && <p className="text-red-500 mt-1 text-xl font-pixel">{nameError}</p>}
                     </div>
 
-                    <div className="w-full flex flex-col items-center mt-4">
-                        <label className='label'>Imagem da categoria</label>
-                        <div
-                            className="bg-[#FFC376] p-[1rem] h-[14rem] w-[14rem] flex items-center justify-center border-8 border-[#D87B26] cursor-pointer mt-4 shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] relative"
-                            onClick={() => document.getElementById('category-image-input').click()}
-                        >
-                            <input
-                                type="file"
-                                id="category-image-input"
-                                className="hidden"
-                                onChange={handleImageChange}
-                            />
-                            {imagePreview ? (
-                                <img
-                                    src={imagePreview}
-                                    alt="preview da imagem"
-                                    className="w-full h-full z-0 absolute object-cover inset-0"
-                                />
-                            ) : (
-                                <i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
-                            )}
-                        </div>
+                    <div className="form-control mb-4">
+                        <label className="label" htmlFor="category-image">
+                            <span className="label-text alt-color-5">Selecione uma imagem</span>
+                        </label>
+                        <input
+                            type="file"
+                            className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+                            onChange={handleImageChange}
+                            name="category-image"
+                        />
                     </div>
-                </ShortModal>
+
+                    {imageSrc && (
+                        <Cropper
+                            src={imageSrc}
+                            style={{ height: 400, width: "100%" }}
+                            // Configurações do Cropper.js
+                            aspectRatio={1}
+                            guides={false}
+                            onInitialized={(instance) => setCropper(instance)}
+                        />
+                    )}
+                </Modal>
             )}
 
+            {/* Componente flash message, verifica se o estado flash é true e então renderiza a flash message */}
             {flash && (
                 <FlashMessage
                     message={flash.message}
@@ -166,7 +163,7 @@ function Category(props) {
                 />
             )}
         </>
-    );
+    )
 }
 
-export default Category;
+export default Category
