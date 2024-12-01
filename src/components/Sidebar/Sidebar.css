@@ -2,3 +2,28 @@
     width: 40px !important;
     height: 40px !important; 
   }
+
+  .MenuItem {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .MenuItem a {
+    display: block;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+  }
+  .css-ewdv3l{
+    background-color: #6b3710;
+    margin-bottom: 0;
+  }
+  
+  #ps-submenu-content-test-id{
+    background-color: #6b3710;
+  }
+  .css-18unl23{
+    background-color: #6b3710;
+  }
