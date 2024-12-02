@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Loading from '../Loading/Loading'
 import { useState } from 'react'
 import 'react-tippy/dist/tippy.css'
@@ -8,6 +8,9 @@ import api from '../../services/api'
 
 function ModalProducts(props) {
     const [modal, setIsModal] = useState(1);
+    const [sectors, setSectors] = useState([])
+    const [locals, setLocals] = useState([])
+    const [localActive,setLocalActive] = useState(null)
     const [editProd, setEditProd] = useState({
       product_name: '',
       product_stock: '',
@@ -17,12 +20,33 @@ function ModalProducts(props) {
       product_perishable: '',
       expiration_date: ''
     })
-
+    const activelocal = (e) => {
+      console.log('evento',e);
+      
+      setLocalActive(e.target.value)
+    }
+    useEffect(() => {
+      const fetchSectors = async () => {
+        const setores = await api.get('/sector')
+        setSectors(setores.data)
+  
+      }
+      const fetchLocals = async () => {
+        const locais = await api.get('/local')
+        
+        setLocals(locais.data)
+      }
+      fetchLocals()
+      fetchSectors()
+    },[])
+    console.log('localactive',localActive);
+    
     const { productInfo } = props
     console.log('productInfor',productInfo);
     
     const inputmodal = 'p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded poppins-medium my-1 transition-all duration-[100ms] ease-in-out alt-color-5'
     const inputmodaledit = 'w-full p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded poppins-medium my-1 transition-all duration-[100ms] ease-in-out alt-color-5'
+    
     const editarProd = async ()=>{
       const prod_nome = document.getElementById('prod_nome').value
       const edit_stock = document.getElementById('edit_stock').value
@@ -130,16 +154,13 @@ function ModalProducts(props) {
     
           
           
-          <p className='mt-2'> É perecível :</p>
-          <p className={inputmodal}>{productInfo.product_perishable ? 'Sim' : 'Não'}</p>
+          <p className={'mt-2'}> É perecível :</p>
+          <p className={inputmodaledit + "cursor-pointer label"}>{productInfo.product_perishable ? 'Sim' : 'Não'}</p>
           <div className='my-4 flex justify-center '>
           <a onClick={buyModal} className="bg-[#30551A] cursor-pointer mx-1 px-3 py-2 text-white rounded-md" >Comprar</a>
-          <a onClick={sellModal} className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md"
-           
-           
-          >
-            Vender
-          </a>
+          <a onClick={sellModal} className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md">Vender</a>
+          <label htmlFor={props.modalName} className="px-5 ml-auto py-2 quinteral-color-bg rounded-md poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
+
           </div>
       </div>
       </div>
@@ -164,47 +185,82 @@ function ModalProducts(props) {
           
           <div>
           <p> Nome : </p>
-          <input id='prod_nome' className={inputmodaledit } placeholder={'Un.'}/>
-          <p> Estoque : </p>
-          <input id='edit_stock' className={inputmodaledit } placeholder={'Un.'}/>
+          <input id='prod_nome' className={inputmodaledit } placeholder={'Und...'}/>
 
           <p> Estoque Mínimo : </p>
-          <input id='edit_stock_min' className={inputmodaledit} placeholder={'Un.'}/>
+          <input id='edit_stock_min' className={inputmodaledit} placeholder={'Und...'}/>
           <p> Valor de custo : </p>
-          <input id='edit_cost_value' className={inputmodaledit} placeholder={'R$'}/>
+          <input id='edit_cost_value' className={inputmodaledit} placeholder={'R$...'}/>
           <p> Valor de venda : </p>
-          <input id='edit_sell_value' className={inputmodaledit} placeholder={'R$'}/>
+          <input id='edit_sell_value' className={inputmodaledit} placeholder={'R$...'}/>
           <p> Quantidade máxima por lote : </p>
-          <input id='edit_sell_value' className={inputmodaledit} placeholder={'R$'}/>
+          <input id='edit_sell_value' className={inputmodaledit} placeholder={'R$...'}/>
           </div>
-          
-         
-    
-    
-          
-          
-          
+           
+          {locals && sectors ? (
+  <>
+     <p>Local:</p>
+    <select
+      id="edit_local"
+      onChange={activelocal}
+      className={inputmodaledit}
+      aria-label="Selecione um Local"
+    >
+      <option value="">Escolha um local</option>
+      {locals.map((local) => (
+        <option key={local.local_id} value={local.local_id}>
+          {local.local_name}
+        </option>
+      ))}
+    </select>
+      <p>Setor:</p>
+    <select
+      id="edit_sector"
+      className={inputmodaledit}
+      aria-label="Selecione um Setor"
+    >
+      
+      {localActive
+        ?<>
+        {sectors
+            .filter((sector) => sector.local_id == localActive)
+            .map((sector) => (
+              <option key={sector.sector_id} value={sector.sector_id}>
+                {sector.sector_name}
+              </option>
+            ))}
+          </> 
+        : 
+        <option disabled> Escolha um local</option> }
+    </select>
+  </>
+) : (
+  <Loading />
+)}
+            
+            
           <div className="form-control my-1">
           <label className={inputmodaledit + "cursor-pointer label"}>
-            <span className=" text-[#6B3710] ">É perecível</span>
+            <span className=" text-[#da9d54] ">É perecível?</span>
             <input
               id='edit_perishable'
               type="checkbox"
               className="toggle toggle-primary"
-            
+              placeholder='É perecível'
       
             />
           </label>
         </div>
 
         <div className="form-control mb-4">
-          <label className="label">
-            <span className="label-text  text-[#6B3710]">Data de Validade</span>
-          </label>
+        
+          <p className=" text-[#6B3710] poppins ">Data de Validade</p>
+          
           <input
             id='edit_expiration_date'
             type="date"
-            className={inputmodaledit + "cursor-pointer label"}
+            className={inputmodaledit + "cursor-pointer label  text-[#da9d54]"}
+            color='#da9d54'
             name="expiration_date"
             
           />
@@ -213,8 +269,8 @@ function ModalProducts(props) {
             <div className='my-4 flex justify-center '>
             
                 <div className="modal-action pb-2 ">
-                  <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
-                  <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-auto shadow-md hvr-grow alt-color-5">Salvar</button>
+                  <label htmlFor={props.modalName} className="px-5 py-2 quinteral-color-bg rounded-md poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
+                  <button type="submit" className="px-5 py-2 quarternary-color-bg rounded-md  poppins align-middle my-auto shadow-md hvr-grow alt-color-5">Salvar</button>
                 </div>
             </div>
           
@@ -231,7 +287,7 @@ function ModalProducts(props) {
           <h1>Registro de Compra</h1>
           <p> Quantidade : </p>
           <input id='qtdbuy' className={inputmodaledit } placeholder={'Un.'}/>
-              {productInfo.is_perishable ?<><p> Quantidade : </p><input id='expiração' className={inputmodaledit } type='date' /></> : <></>}
+              {productInfo.is_perishable ?<><p> Quantidade : </p><input id='expiracaobuy' className={inputmodaledit } type='date' /></> : <></>}
               <div className="modal-action pb-2 ml-auto text-end align-end text-end justify-end">
                 <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
                 <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-autoshadow-md hvr-grow alt-color-5">Finalizar</button>
@@ -242,15 +298,15 @@ function ModalProducts(props) {
     else if (modal == 3 ){
       return (
     
-        <div className='flex w-full flex-wrap  flex' >
+        <div className='flex w-full flex-wrap  flex-col' >
           <h1>Registro de Venda</h1>
           <p> Quantidade : </p>
-          <input id='qtd' className={inputmodaledit } placeholder={'Un.'}/>
-          
-           <div className="modal-action pb-2 ml-auto text-end align-end text-end justify-end">
-                  <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
-                  <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-autoshadow-md hvr-grow alt-color-5">Finalizar</button>
-                </div>
+          <input id='qtdsell' className={inputmodaledit } placeholder={'Un.'}/>
+              {productInfo.is_perishable ?<><p> Quantidade : </p><input id='expiracaosell' className={inputmodaledit } type='date' /></> : <></>}
+              <div className="modal-action pb-2 ml-auto text-end align-end text-end justify-end">
+                <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
+                <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-autoshadow-md hvr-grow alt-color-5">Finalizar</button>
+              </div>
       </div>
       )
     }
