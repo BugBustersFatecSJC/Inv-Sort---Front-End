@@ -55,10 +55,7 @@ function ProductTableMvSt() {
 
     return pages;
   };
-<<<<<<< HEAD
 
-=======
->>>>>>> 845b428272a5465f464facb6ff0aa4423bd10ac8
   const downloadPDF = async () => {
     try {
       const response = await Axios.get('http://localhost:3001/stock-movements/pdf', {

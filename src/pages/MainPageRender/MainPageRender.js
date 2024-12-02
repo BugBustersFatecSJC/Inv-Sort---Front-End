@@ -176,7 +176,7 @@ function MainPageRender() {
 
       ) : (<> 
               
-        <div className="flex justify-between gap-4 grid mt-6 grid-cols-4 category-container-grid">
+        <div className={`flex responsividade justify-between gap-4 grid mt-6 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 `}>
         
         <Category onCategoryAdded={(newCategory) => {
                 addCategory(newCategory)

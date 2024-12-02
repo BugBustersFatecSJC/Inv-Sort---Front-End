@@ -7,10 +7,14 @@ import api from '../../services/api'
 
 
 function ModalProducts(props) {
-    const [modal, setIsModal] = useState(1);
-    const [sectors, setSectors] = useState([])
-    const [locals, setLocals] = useState([])
-    const [localActive,setLocalActive] = useState(null)
+  const [modal, setIsModal] = useState(1);
+  const [locals, setLocals] = useState([]);
+  const [sectors, setSectors] = useState([]);
+  const [localActive, setLocalActive] = useState('');
+  const [qtdBuy, setQtdBuy] = useState('');
+  const [expirationBuy, setExpirationBuy] = useState('');
+  const [qtdSell, setQtdSell] = useState('');
+  const [expirationSell, setExpirationSell] = useState('');
     const [editProd, setEditProd] = useState({
       product_name: '',
       product_stock: '',
@@ -39,42 +43,42 @@ function ModalProducts(props) {
       fetchLocals()
       fetchSectors()
     },[])
-    console.log('localactive',localActive);
+    console.log('localactive',editProd);
     
     const { productInfo } = props
-    console.log('productInfor',productInfo);
+    
     
     const inputmodal = 'p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded poppins-medium my-1 transition-all duration-[100ms] ease-in-out alt-color-5'
     const inputmodaledit = 'w-full p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded poppins-medium my-1 transition-all duration-[100ms] ease-in-out alt-color-5'
     
-    const editarProd = async ()=>{
-      const prod_nome = document.getElementById('prod_nome').value
-      const edit_stock = document.getElementById('edit_stock').value
-      const edit_stock_min = document.getElementById('edit_stock_min').value
-      const edit_cost_value = document.getElementById('edit_cost_value').value
-      const edit_sell_value = document.getElementById('edit_sell_value').value
-      const edit_perishable = document.getElementById('edit_perishable').checked
-      const edit_expiration_date = document.getElementById('edit_expiration_date').value
-      
-      setEditProd({
+    const editarProd = async () => {
+      const prod_nome = document.getElementById('prod_nome').value;
+      const edit_stock = document.getElementById('edit_stock').value;
+      const edit_stock_min = document.getElementById('edit_stock_min').value;
+      const edit_cost_value = document.getElementById('edit_cost_value').value;
+      const edit_sell_value = document.getElementById('edit_sell_value').value;
+      const edit_perishable = document.getElementById('edit_perishable').checked;
+      const edit_expiration_date = document.getElementById('edit_expiration_date').value;
+    
+      const updatedProduct = {
         product_name: prod_nome,
         product_stock: edit_stock,
         product_stock_min: edit_stock_min,
         prod_cost_value: edit_cost_value,
         prod_sell_value: edit_sell_value,
         product_perishable: edit_perishable,
-        expiration_date: edit_expiration_date
-      })
-
+        expiration_date: edit_expiration_date,
+      };
+      console.log(updatedProduct);
+      
       try {
-        const result = await api.put(`/products/${productInfo.product_id}`, editProd)
-        console.log(result)
-
+        const result = await api.put(`/products/${productInfo.product_id}`, updatedProduct);
+        console.log(result);
+      } catch (error) {
+        console.error(error);
       }
-      catch (error) {
-        console.log(error)
-      }
-    }
+    };
+    
     const editModal = () => {
       setIsModal(0)
     }
@@ -83,8 +87,51 @@ function ModalProducts(props) {
     }
     const sellModal = () => {
       setIsModal(3)
-    }
-    
+    } 
+    const handleBuy = async () => {
+      if (!qtdBuy) {
+          alert('Preencha a quantidade!');
+          return;
+      }
+
+      const payload = {
+          product_id: productInfo.product_id,
+          quantity: qtdBuy,
+          expiration_date: productInfo.is_perishable ? expirationBuy : null,
+      };
+
+      try {
+          const result = await api.post(`/buyandsell/buy/${productInfo.product_id}`, payload);
+          console.log(result.data);
+          alert('Compra registrada com sucesso!');
+      } catch (error) {
+          console.error(error);
+          alert('Erro ao registrar compra!');
+      }
+  };
+
+  const handleSell = async () => {
+      if (!qtdSell) {
+          alert('Preencha a quantidade!');
+          return;
+      }
+
+      const payload = {
+          product_id: productInfo.product_id,
+          quantity: qtdSell,
+          expiration_date: productInfo.is_perishable ? expirationSell : null,
+      };
+
+      try {
+          const result = await api.post(`/buyandsell/sell/${productInfo.product_id}`, payload);
+          console.log(result.data);
+          alert('Venda registrada com sucesso!');
+      } catch (error) {
+          console.error(error);
+          alert('Erro ao registrar venda!');
+      }
+  };
+
     if (modal == 1){
       return (
     
@@ -178,7 +225,7 @@ function ModalProducts(props) {
           <img src={productInfo.product_img || '../../images/default.png'} alt={'image do produto:' + productInfo.product_name} className={`   ${productInfo.product_img===null?'rounded-full':' rounded-full border-[0.25rem] border-[#D87B26]'} text-start  bg-[#3E1900]   m-auto object-fill `} />
           
         </div>
-        <form  className='w-full mt-10 sm:mt-0  '>
+        <form onSubmit={editarProd} className='w-full mt-10 sm:mt-0  '>
           
          
           
@@ -280,36 +327,55 @@ function ModalProducts(props) {
     </div>
       )
     }
-    else if (modal == 2 ){
-      return (
-    
-        <div className='flex w-full flex-wrap  flex-col' >
-          <h1>Registro de Compra</h1>
-          <p> Quantidade : </p>
-          <input id='qtdbuy' className={inputmodaledit } placeholder={'Un.'}/>
-              {productInfo.is_perishable ?<><p> Quantidade : </p><input id='expiracaobuy' className={inputmodaledit } type='date' /></> : <></>}
-              <div className="modal-action pb-2 ml-auto text-end align-end text-end justify-end">
-                <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
-                <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-autoshadow-md hvr-grow alt-color-5">Finalizar</button>
-              </div>
-      </div>
-      )
-    }
-    else if (modal == 3 ){
-      return (
-    
-        <div className='flex w-full flex-wrap  flex-col' >
-          <h1>Registro de Venda</h1>
-          <p> Quantidade : </p>
-          <input id='qtdsell' className={inputmodaledit } placeholder={'Un.'}/>
-              {productInfo.is_perishable ?<><p> Quantidade : </p><input id='expiracaosell' className={inputmodaledit } type='date' /></> : <></>}
-              <div className="modal-action pb-2 ml-auto text-end align-end text-end justify-end">
-                <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
-                <button type="submit" className="px-5 py-1 quarternary-color-bg rounded  poppins align-middle my-autoshadow-md hvr-grow alt-color-5">Finalizar</button>
-              </div>
-      </div>
-      )
-    }
-}
+    else if (modal == 2){
+     return (
+      <div className='flex w-full flex-wrap  '>
+      <h1>Registro de Compra</h1>
+      <input
+          type="number"
+          placeholder="Quantidade"
+          value={qtdBuy}
+          className={inputmodaledit}
+          onChange={(e) => setQtdBuy(e.target.value)}
+      />
+      {productInfo.is_perishable && (
+          <input
+              type="date"
+              value={expirationBuy}
+              className={inputmodaledit}
+              onChange={(e) => setExpirationBuy(e.target.value)}
+          />
+      )}
+      <button  className='px-5 py-2 quarternary-color-bg rounded-md  poppins align-middle my-auto shadow-md hvr-grow alt-color-5' onClick={handleBuy}>Finalizar Compra</button>
+      <button className='px-5 py-2 quinteral-color-bg rounded-md poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer' onClick={() => setIsModal(1)}>Cancelar</button>
+  </div>
+     )
+  }
+  else if (modal === 3) {
+     return (
+      <div>
+      <h1>Registro de Venda</h1>
+      <input
+          type="number"
+          placeholder="Quantidade"
+          value={qtdSell}
+          className={inputmodaledit}
+          onChange={(e) => setQtdSell(e.target.value)}
+      />
+      {productInfo.is_perishable && (
+          <input
+              type="date"
+              value={expirationSell}
+              className={inputmodaledit}
+              onChange={(e) => setExpirationSell(e.target.value)}
+          />
+      )}
+      <button className='px-5 py-2 quarternary-color-bg rounded-md  poppins align-middle my-auto shadow-md hvr-grow alt-color-5' onClick={handleSell}>Finalizar Venda</button>
+      <button className='px-5 py-2 quinteral-color-bg rounded-md poppins align-middle my-auto shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer' onClick={() => setIsModal(1)}>Cancelar</button>
+  </div>
+     )
+  }
+};
 
-export default ModalProducts
+
+export default ModalProducts;

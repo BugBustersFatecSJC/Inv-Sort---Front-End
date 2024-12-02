@@ -26,7 +26,7 @@ const ProductTable = () => {
 
 
   const { id } = useParams();
-  console.log(productInfo);
+  console.log('batches',productInfo.batches);
 
   // Fetch products from API
   const fetchProducts = async () => {
