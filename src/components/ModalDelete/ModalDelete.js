@@ -10,8 +10,8 @@ function ModalDelete(props) {
             {props.children}
 
             <div className="modal-action">
-              <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded font-pixel text-2xl shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
-              <button type="submit" className="px-5 py-1 quarternary-color-bg rounded font-pixel text-2xl shadow-md hvr-grow alt-color-5">Excluir</button>
+              <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded poppins shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
+              <button type="submit" className="px-5 py-1 quarternary-color-bg rounded poppins shadow-md hvr-grow alt-color-5">Excluir</button>
             </div>
         </form>
         </div>
