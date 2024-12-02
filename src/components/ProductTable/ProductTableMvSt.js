@@ -54,6 +54,7 @@ function ProductTableMvSt() {
     }
 
     return pages;
+  };
 
   const downloadPDF = async () => {
     try {
@@ -214,7 +215,7 @@ function ProductTableMvSt() {
                 <td className="text-xs sm:text-sm">{movement.batch ? movement.batch.batch_id : 'N/A'}</td>
                 <td className="text-xs sm:text-sm">{movement.movement_type}</td>
                 <td className="text-xs sm:text-sm">{movement.user ? movement.user.username : 'N/A'}</td>
-                <td className="text-xs sm:text-sm">{new Date(movement.movement_date).toLocaleString()}</td>
+                <td className="text-xs sm:text-sm">{movement.movement_date}</td>
                 <td className="text-xs sm:text-sm">{movement.category ? movement.category.category_name : 'N/A'}</td>
               </tr>
             ))}
@@ -222,40 +223,36 @@ function ProductTableMvSt() {
         </table>
       </div>
 
-     
-  {/* Paginação */}
-  <div className="flex justify-center mt-8">
+      <div className="flex justify-center mt-4">
         <button
           onClick={goToPreviousPage}
-          className="bg-[#6B3710] text-[#FFC376] font-medium px-4 py-2 rounded-lg mr-2 hover:bg-[#4e2d19] disabled:bg-[#4c2a17] disabled:text-[#ccc] disabled:cursor-not-allowed"
           disabled={currentPage === 1}
+          className="px-4 py-2 bg-[#6B3710] text-white rounded-md mr-2"
         >
-              <ChevronLeftIcon className="h-5 w-5 text-[#FFC376]" />
+          <ChevronLeftIcon className="h-5 w-5" />
         </button>
 
-        {paginationRange().map((page, index) =>
-          page === '...' ? (
-            <span key={index} className="px-4 py-2">...</span>
-          ) : (
-            <button
-              key={index}
-              onClick={() => goToPage(page)}
-              className={`px-4 py-2 rounded-lg ${currentPage === page ? 'bg-[#4e2d19] text-[#FFC376]' : 'text-[#6B3710] hover:bg-[#C17B46]'}`}
-            >
-              {page}
-            </button>
-          )
-        )}
+        {paginationRange().map((page, index) => (
+          <button
+            key={index}
+            onClick={() => goToPage(page)}
+            className={`px-4 py-2 rounded-md ${
+              page === currentPage ? 'bg-[#6B3710] text-white' : 'bg-[#F5A66D] text-[#6B3710]'
+            }`}
+            disabled={page === '...'}
+          >
+            {page}
+          </button>
+        ))}
 
         <button
           onClick={goToNextPage}
-          className="bg-[#6B3710] text-[#FFC376] font-medium px-4 py-2 rounded-lg ml-2 hover:bg-[#4e2d19] disabled:bg-[#4c2a17] disabled:text-[#ccc] disabled:cursor-not-allowed"
           disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-[#6B3710] text-white rounded-md ml-2"
         >
-              <ChevronRightIcon className="h-5 w-5 text-[#FFC376]" />
+          <ChevronRightIcon className="h-5 w-5" />
         </button>
       </div>
-
 
       {isModalOpen && selectedMovement && (
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
