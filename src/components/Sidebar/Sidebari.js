@@ -142,26 +142,6 @@ function Sidebari({ content }) {
                       {collapsed ? 'Usuários' : 'Gerenciar Usuários'}
                     </MenuItem>
                     <MenuItem
-                      icon={<img id="person" src="/images/config.png" />}
-                      className="poppins-semibold"
-                      component={<Link to="/settings" />}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6b3710'}
-                      style={{
-                        backgroundColor: '#6b3710',
-                        color: 'rgb(255,195,118)',
-                        margin: '0',
-                        border: 'none',
-                        padding: '10px',
-                        transition: 'background-color 0.3s ease',
-                        width: collapsed ? '40px' : '200px',
-                        height: '40px',
-                        width:'100%',
-                      }}
-                    >
-                      {collapsed ? 'Config' : 'Configurações'}
-                    </MenuItem>
-                    <MenuItem
                         icon={<img id="person" src="/images/supplier.png" />}
                         className="poppins-semibold"
                         component={<Link to="/suppliers" />}
@@ -283,26 +263,6 @@ function Sidebari({ content }) {
                         }}
                       >
                         {collapsed ? 'Gerenciar Usuários' : "Gerenciar usuários"}
-                      </MenuItem>
-                      <MenuItem
-                        icon={<img id="person" src="/images/config.png" />}
-                        className="poppins-semibold"
-                        component={<Link to="/settings" />}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6b3710'}
-                        style={{
-                          width:'100%',
-                          backgroundColor: '#6b3710',
-                          color: 'rgb(255,195,118)',
-                          margin: '0',
-                          border: 'none',
-                          padding: '10px',
-                          transition: 'background-color 0.3s ease',
-                          width: collapsed ? '200px' : '40px', 
-                          height: '40px',
-                        }}
-                      >
-                        {collapsed ? 'Configurações' : 'Configura...'}
                       </MenuItem>
                       <MenuItem
                         icon={<img id="person" src="/images/supplier.png" />}
