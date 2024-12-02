@@ -98,7 +98,7 @@ code {
 }
 
 .font-pixel {
-  font-family: 'VT323', monospace;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Não é necessário criar um atributo para cada peso de fonte, basta apenas adicionar .text-bold e afins para mudar o peso da fonte */
@@ -297,8 +297,8 @@ code {
 }
 
 input::file-selector-button {
-  font-size: 1.2rem;
-  font-family: 'VT323', monospace;
+  font-size: 0.5rem!important;
+  font-family: "Poppins", sans-serif;
   background-color: hwb(26 2% 30%);    
   border: thin solid hwb(26 2% 30%);
   border-radius: 3px;
