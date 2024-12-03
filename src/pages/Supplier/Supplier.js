@@ -55,21 +55,7 @@ function SupplierPage() {
     );
   };
 
-  // const removeSupplier = async (supplierId) => {
-  //   const confirmDelete = window.confirm('Você tem certeza que deseja excluir este fornecedor?');
-  //   if (!confirmDelete) {
-  //     return;
-  //   }
 
-  //   try {
-  //     await api.delete(`/supplier/${supplierId}`);
-  //     setSuppliers((prevSuppliers) =>
-  //       prevSuppliers.filter((supplier) => supplier.supplier_id !== supplierId)
-  //     );
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   const toggleModal = (supplier = null) => {
     setSelectedSupplier(supplier);
@@ -220,7 +206,7 @@ function SupplierPage() {
             <div>
               <div className='flex justify-between w-full items-end mb-6 table-header-container'>
                 <div className='flex items-end'>
-                  <p className="font-pixel text-2xl cursor-pointer p-2 bg-[#008148] rounded text-white" onClick={() => toggleModal()}>
+                  <p className="poppins-medium  cursor-pointer p-2 bg-[#008148] rounded text-white" onClick={() => toggleModal()}>
                     Adicionar fornecedor
                   </p>
                 </div>
@@ -264,18 +250,18 @@ function SupplierPage() {
                           <td className="text-xs sm:text-sm">
                             {supplier.address}
                           </td>
-                          <td className="flex items-center justify-center space-x-4 w-full">
-                            <div className='w-full flex justify-evenly my-2'>
+                          <td className="flex items-center justify-center space-x-4 p-o w-full">
+                            <div className='w-full flex justify-evenly p-0'>
                               <button 
                                 onClick={() => toggleModal(supplier)} 
-                                className="flex space-x-3 font-pixel p-2 justify-center items-center btn-3d bg-[#4162a8]" 
+                                className="flex  font-pixel border-0 p-3 justify-center items-center btn-3d alt-color-bg"	 color='#6b3710'
                               >
                                 <i className="fa-solid fa-pencil"></i>
                               </button> 
 
                               <button
                                 onClick={() => confirmDeleteSupplier(supplier.supplier_id)}
-                                className="flex space-x-3 font-pixel p-2 justify-center items-center btn-3d bg-[#FF1B1C]"
+                                className="flex border-0  font-pixel p-3 justify-center items-center btn-3d bg-[#FF1B1C]"
                               >
                                 <i className="fa-solid fa-trash"></i>
                               </button>

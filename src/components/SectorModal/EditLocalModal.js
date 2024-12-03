@@ -39,7 +39,7 @@ function EditLocalModal({ local, onLocalUpdated, onClose }) {
         <label className="label">Nome do Local</label>
         <input
           type="text"
-          className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+          className="p-[4px] poppins-medium shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded  transition-all duration-[100ms] ease-in-out alt-color-5"
           value={localName}
           onChange={(e) => setLocalName(e.target.value)}
           required
@@ -49,7 +49,7 @@ function EditLocalModal({ local, onLocalUpdated, onClose }) {
         <label className="label">Endereço</label>
         <input
           type="text"
-          className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+          className="p-[4px] poppins-medium shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded  transition-all duration-[100ms] ease-in-out alt-color-5"
           value={localAddress}
           onChange={(e) => setLocalAddress(e.target.value)}
         />
