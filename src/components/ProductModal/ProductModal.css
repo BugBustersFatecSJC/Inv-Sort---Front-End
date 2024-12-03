@@ -1,0 +1,38 @@
+@media screen and (max-width: 1822px) {
+    .modal-box .prod-modal {
+        max-width: 75%;
+    }
+}
+
+@media screen and (max-width: 1520px) {
+    .modal-box .prod-modal {
+        max-width: 95%;
+    }
+}
+
+@media screen and (max-width: 1222px) {
+    .modal-main-container {
+        flex-direction: column;
+    }   
+
+    .modal-main-container > div {
+        width: 100%;
+
+    }
+
+    .modal-main-container > div:first-child > div {
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 512px) {
+    .modal-action {
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 470px) {
+    .preco-container {
+        flex-direction: column;
+    }
+}
