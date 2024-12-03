@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'; // Certifique-se de que useContext é importado aqui
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { UserContext, UserProvider } from './context/userContext'; // Importações dos seus contextos
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from 'react-router-dom';
+import { UserContext, UserProvider } from './context/userContext';
 import Login from './pages/Login/Login';
 import InitialSignUp from './pages/InitialSignUp/InitialSignUp';
 import MainPageRender from './pages/MainPageRender/MainPageRender';
@@ -24,30 +24,46 @@ function ProtectedLogin({ element: Element }) {
   return !user ? <Element /> : <Navigate to="/products" />;
 }
 
+/**
+ * Verifica se há algum usuário registrado no banco de dados - através da requisição
+ * check-login - e redireciona para a página de primeiro cadastro se houver necessidade
+ */
+function GlobalRedirectGuard() {
+  const { needsRegistration } = useContext(UserContext);
+
+  if (needsRegistration) {
+    return <Navigate to="/cadastro" />;
+  }
+
+  return <Outlet />;
+}
+
 function App() {
   return (
     <UserProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<ProtectedLogin element={Login} />} />
           <Route path="/cadastro" element={<InitialSignUp />} />
-          <Route path="/login" element={<ProtectedLogin element={Login} />} />
-          <Route path="/products" element={<ProtectedRoute element={MainPageRender} />} />
-          <Route path="/analytics" element={<ProtectedRoute element={Analytics} />} />
-          <Route path="/userpage" element={<ProtectedRoute element={UserPage} />} />
+          <Route element={<GlobalRedirectGuard/>}>
+            <Route path="/" element={<ProtectedLogin element={Login} />} />
+            <Route path="/login" element={<ProtectedLogin element={Login} />} />
+            <Route path="/products" element={<ProtectedRoute element={MainPageRender} />} />
+            <Route path="/analytics" element={<ProtectedRoute element={Analytics} />} />
+            <Route path="/userpage" element={<ProtectedRoute element={UserPage} />} />
 
 
-          <Route path="/movementPage" element={<ProtectedRoute element={MovementPage} />} />
-          <Route path="/stockmovements" element={<ProtectedRoute element={MovementPage} />} />
+            <Route path="/movementPage" element={<ProtectedRoute element={MovementPage} />} />
+            <Route path="/stockmovements" element={<ProtectedRoute element={MovementPage} />} />
 
-          <Route path="/batches" element={<ProtectedRoute element={Batch} />} />
-          <Route path="/sectors" element={<ProtectedRoute element={Sector} />} />
-          <Route path="/suppliers" element={<ProtectedRoute element={Supplier} />} />
-          <Route path="/profile" element={<ProtectedRoute element={UserProfile} />} />
+            <Route path="/batches" element={<ProtectedRoute element={Batch} />} />
+            <Route path="/sectors" element={<ProtectedRoute element={Sector} />} />
+            <Route path="/suppliers" element={<ProtectedRoute element={Supplier} />} />
+            <Route path="/profile" element={<ProtectedRoute element={UserProfile} />} />
 
-          <Route path="/buyandsell/:id" element={<ProtectedRoute element={BuyAndSell}/>}/>
+            <Route path="/buyandsell/:id" element={<ProtectedRoute element={BuyAndSell}/>}/>
 
-          <Route path="/cadastra-usuario" element={<ProtectedRoute element={UserRegister} />} />
+            <Route path="/cadastra-usuario" element={<ProtectedRoute element={UserRegister} />} />
+          </Route>
         </Routes>
       </Router>
     </UserProvider>

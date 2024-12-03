@@ -88,6 +88,8 @@ function Category(props) {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             props.onCategoryAdded(response.data);
+            console.log(response.data);
+            
             closeModal();
             flashSuccess();
         } catch (err) {
@@ -101,10 +103,10 @@ function Category(props) {
 
     return (
         <>
-            <div onClick={openModal} className='w-full alt-color-6-bg rounded shadow-md mt-4 mb-[40px] cursor-pointer'>
-                <div className='p-[1rem] h-[200px] flex flex-col items-center justify-center'>
+            <div onClick={openModal} className='w-full alt-color-6-bg rounded shadow-md cursor-pointer h-[200px] '>
+                <div className='flex flex-col items-center justify-center h-full'>
                     <i className="fa-solid fa-plus text-4xl"></i>
-                    <p className='mt-4'>Adicionar categoria</p>
+                    <p className='mt-4 text-center'>Adicionar categoria</p>
                 </div>
             </div>
 
@@ -115,22 +117,6 @@ function Category(props) {
                     modalName="cria-categoria"
                     closeModal={closeModal}
                 >
-                    <div className="form-control mb-4">
-                        <label className="label">
-                            <span className="label-text alt-color-5">Nome da categoria</span>
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Digite o nome da categoria"
-                            className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
-                            required
-                            value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            name="category-name"
-                        />
-                        {nameError && <p className="text-red-500 mt-1 text-xl font-pixel">{nameError}</p>}
-                    </div>
-
                     <div className="w-full flex flex-col items-center mt-4">
                         <label className='label'>Imagem da categoria</label>
                         <div
@@ -153,6 +139,21 @@ function Category(props) {
                                 <i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
                             )}
                         </div>
+                    </div>
+                    <div className="form-control mb-4">
+                        <label className="label">
+                            <span className="label-text alt-color-5">Nome da categoria</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Digite o nome da categoria"
+                            className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+                            required
+                            value={categoryName}
+                            onChange={(e) => setCategoryName(e.target.value)}
+                            name="category-name"
+                        />
+                        {nameError && <p className="text-red-500 mt-1 text-xl font-pixel">{nameError}</p>}
                     </div>
                 </ShortModal>
             )}

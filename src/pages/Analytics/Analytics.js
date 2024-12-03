@@ -5,7 +5,7 @@ import Cardsanalytics from '../../components/Cardsanlaytics/Cardsanalytics';
 import Mainchart from '../../components/MainChart/Mainchart';
 import Sectorchart from '../../components/Sectorchart/Sectorchart'
 import api from '../../services/api';
-
+import Loading from '../../components/Loading/Loading';
 function Analytics() {
   const [loading, setloading] = useState(false);
   const [cards, setCards] = useState([])
@@ -40,7 +40,13 @@ function Analytics() {
       fetchCards()
   }, [])
   if (cards.length === 0) {
-    return <div>Loading...</div>;
+    return (
+      
+      <div className='main-color-bg min-h-[100vh] flex align-middle'>
+      <Loading/>
+      </div>
+      
+    );
   }
   
   console.log(cards);
@@ -48,10 +54,10 @@ function Analytics() {
   return (
     <div className='main-color-bg h-[100%] flex'>
       
+      
       <Sidebar />
-     
       <div id='main' className='w-[100%] min-h-[100vh] px-4 h-[100%] grid-col-2 flex overflow-scroll overflow-x-hidden flex-wrap flex-col  text-center justify-start items-center'>
-
+      
         <div className='flex flex-col w-full items-end justify-start p-4'>
         <UserProfileIcon/>
 

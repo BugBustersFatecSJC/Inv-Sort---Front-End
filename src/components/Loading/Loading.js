@@ -2,7 +2,7 @@ import React from 'react'
 
 function Loading() {
   return (
-    <div className='h-full w-full flex flex-col justify-center items-center'>
+    <div className='h-full w-full m-auto flex flex-col justify-center items-center'>
       <figure className='w-[3rem]'>
           <img src="img/loading.gif" alt=''/>
       </figure>

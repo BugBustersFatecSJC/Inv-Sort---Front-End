@@ -67,7 +67,7 @@ function Login() {
 
   return (
     <div className='main-color-bg h-screen flex flex-col items-center justify-center'>
-      <form className='flex flex-col items-center w-[30%]' onSubmit={handleSubmit}>
+      <form className='flex flex-col items-center w-[80%] lg:w-[30%]' onSubmit={handleSubmit}>
         <div className='mb-[50px]'>
           <MainLogo />
         </div>

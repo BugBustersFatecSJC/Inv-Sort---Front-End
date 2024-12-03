@@ -5,7 +5,8 @@ import Tooltipporcentagem from '../../components/Tooltipporcentagem/Tooltipporce
 import api from '../../services/api';
 import SectorButton from '../sectorButton/sectorButton';
 import DropdownButtons from '../DropdownButtons/DropdownButtons';
-const COLORS = ['#4B5E71', '#044687', '#09794E', '#853C22', '#729B23', '#7E3998'];
+import Loading from '../Loading/Loading';
+const COLORS = ['#044687', '#09794E', '#853C22', '#729B23', '#7E3998','#4B5E71'];
 
 const Sectorchart = () => {
   const [selectedValue, setSelectedValue] = useState('2024'); // Default value
@@ -27,7 +28,7 @@ const Sectorchart = () => {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false);
+        setLoading(true);
       }
     };
 
@@ -45,7 +46,7 @@ const Sectorchart = () => {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setLoading(false);
+        setLoading(true);
       }
     };
 
@@ -53,7 +54,7 @@ const Sectorchart = () => {
   },[]); // Fetch data whenever selectedValue changes
   
   
-  console.log(anos);
+  console.log('loading',loading);
   
   if (!loading) {
 
@@ -91,6 +92,9 @@ const Sectorchart = () => {
     </ResponsiveContainer>
     </>
   );
+}
+else {
+  <p>Não há dados para a análise</p>
 }
 };
 

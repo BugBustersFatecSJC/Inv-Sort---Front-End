@@ -8,6 +8,8 @@ import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
 import FlashMessage from '../FlashMessage/FlashMessage'
 import { useNavigate } from 'react-router-dom'
+import ShortModal from '../ShortModal/ShortModal'
+import DeleteConfirmationModal from '../DeleteConfirmationModal/DeleteConfirmationModal'
 
 
 /******************************************************************************
@@ -15,6 +17,7 @@ import { useNavigate } from 'react-router-dom'
  *****************************************************************************/
 
 function ProductCategory(props) {
+  const [imagePreview, setImagePreview] = useState(null)
   /**
    * Criação da renderização do componente de loading
    */
@@ -177,13 +180,6 @@ function ProductCategory(props) {
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
 
-    /**
-     * Abre e fecha o modal de categorias
-     */
-    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
-
-    const openCategoryModal = () => setIsCategoryModalOpen(true);
-    const closeCategoryModal = () => setIsCategoryModalOpen(false);
 
     /**
      * Registra o produto
@@ -351,65 +347,107 @@ function ProductCategory(props) {
     navigate('/buyandsell/'+id)
   }
 
-
   /**
-   * Edição da categoria
-   */
-  const [categoryName, setCategoryName] = useState('')
+  * Edição da categoria
+  */
+ const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+ const [categoryName, setCategoryName] = useState('')
+ const [categoryImage, setCategoryImage] = useState(null)
 
-  const handleCategoryUpdate = async(e) => {
-      e.preventDefault()
+ const openCategoryModal = (category) => {
+   setCategoryName(category.category_name)
 
-      const categoryData = {
-          category_name: categoryName,
-      }
+   const imageUrl = category.category_image ? `http://localhost:3001${category.category_image}` : null
+   setCategoryImage(imageUrl)
+   setImagePreview(imageUrl)
 
-      try {
-          await api
-          .put(`/category/${props.categoryKey}`, categoryData)
-          .then(response => console.log(response))
-          
-          props.onCategoryUpdated(props.categoryKey, categoryName)
-          setCategoryName('')
+   console.log(imageUrl)
 
-          closeCategoryModal()
-          flashInfo()
-      } catch (err) {
-          console.log(err)
-          flashError()
-      }
-  }
+   setIsCategoryModalOpen(true)
+ }
+ const closeCategoryModal = () => {
+   setCategoryImage(null)
+   setCategoryName('')
+   setIsCategoryModalOpen(false)
+ }
+
+ const handleCategoryUpdate = async(e) => {
+     e.preventDefault()
+
+     const formData = new FormData();
+     formData.append('category_name', categoryName)
+     formData.append('category_image', categoryImage)
+
+     try {
+         await api
+         .put(`/category/${props.categoryKey}`, formData, {
+           headers: {
+             'Content-Type': 'multipart/form-data'
+           }
+         })
+         .then(response => console.log(response))
+         
+         props.onCategoryUpdated(props.categoryKey, categoryName, categoryImage)
+
+         closeCategoryModal()
+         flashInfo()
+     } catch (err) {
+         console.log(err)
+         flashError()
+     }
+ }
 
   /**
    * Deleta a categoria
    */
-  const handleCategoryDelete = async (category_id) => {
-    const user = localStorage.getItem("user")
-    const jsonUser = JSON.parse(user)
-    if ( jsonUser.role === "admin" || jsonUser.role === "gerente"  ){
-    try {
-      await api
-        .delete(`/category/${category_id}`)
-        .then((response) => {console.log(response)})
+  const [showDeleteCategoryModal, setShowDeleteCategoryModal] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState(null)
 
-        props.onCategoryDeleted(category_id)
-        
-        flashDelete()
-    } catch (err) {
-      console.log(err)
-      flashError()
-    }
-    }
-    else {alert("Você não tem permissão para fazer isso")}
+  const confirmDeleteCategory = (categoryKey) => {
+    setCategoryToDelete(categoryKey)
+    setShowDeleteCategoryModal(true)
   }
+
+  const handleDeleteCategoryCancel = () => {
+      setCategoryToDelete(null)
+      setShowDeleteCategoryModal(false)
+  }
+
+  const handleDeleteCategoryConfirm = async () => {
+    if (!categoryToDelete) return;
+
+    try {
+        await api.delete(`/category/${categoryToDelete}`)
+        props.onCategoryDeleted(categoryToDelete)
+        flashInfo('Categoria excluída com sucesso!')
+    } catch (err) {
+        console.error(err)
+        flashError('Erro ao excluir categoria.')
+    } finally {
+        setCategoryToDelete(null)
+        setShowDeleteCategoryModal(false)
+    }
+  }
+
+  const backgroundSizeOptions = ['100%', '100% 100%']
+
+  const [backgroundSize] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * backgroundSizeOptions.length)
+    return backgroundSizeOptions[randomIndex]
+  })
 
     return (
       // Container da categoria
-
-        <div className='w-[90%] my-2 mx-auto g  bg-[#5F2E09] rounded-md hover:bg-[#3E1900] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] mt-1 h-[200px]  mx-4 flex relative'>
-          <div className={`  transition-opacity duration-200 rounded-md  w-full  bg-[#5F2E09] flex justify-center  items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className='w-full bg-[#5F2E09] rounded-md hover:bg-[#3E1900] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] h-[200px] flex relative'>
+          <div className={`transition-opacity duration-200 rounded-md  w-full bg-[#5F2E09] flex justify-center  items-center justify-center ${!showCategoryProducts ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            style={{
+              backgroundImage: `url('/img/texture.png')`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: backgroundSize,
+            }}
+          >
           <div className="flex flex-col justify-center flex-wrap w-full  "> 
-            <figure className='w-[3rem] mx-auto h-[3rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'>
+            <figure className='w-[4.5rem] mx-auto h-[4.5rem] rounded-full alt-color-4-bg border-4 border-[#D87B26] shadow-[inset_-2px_3px_2px_4px_rgba(0,0,0,0.2)]'>
               {props.categoryImage ? (
                 <img
                   src={`http://localhost:3001${props.categoryImage}`}
@@ -431,11 +469,10 @@ function ProductCategory(props) {
                   <i className="fa-solid fa-eye"></i>
                   
                 </p>
-                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => handleCategoryDelete(props.categoryKey)} style={{ color: "var(--tertiary-color)" }}>
+                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => confirmDeleteCategory(props.categoryKey)} style={{ color: "var(--tertiary-color)" }}>
                   <i className="fa-solid fa-trash"></i>
-                  
                 </p>
-                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={openProdEditModal} style={{ color: "var(--tertiary-color)" }}>
+                <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => openCategoryModal(props.category)} style={{ color: "var(--tertiary-color)" }}>
                   <i className="fa-solid fa-pencil"></i>
                   
                 </p>
@@ -801,6 +838,59 @@ function ProductCategory(props) {
     </div>
   </Modal>
 )}
+
+      {/* Modal de edição de categoria */}
+      {isCategoryModalOpen && (
+        <ShortModal
+            title="Editar categoria"
+            handleSubmit={handleCategoryUpdate}
+            modalName="editar-categoria"
+            closeModal={closeCategoryModal}
+        >
+            <div className='w-full flex flex-col items-center mt-4 '>
+              <label className='label'>Imagem da categoria</label>
+              <div
+                className="bg-[#FFC376] p-[1rem] h-[14rem] w-[14rem] flex items-center justify-center border-8 border-[#D87B26] cursor-pointer shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] relative"
+                onClick={() => document.getElementById('category-image-input').click()}
+              >
+                <input
+                  type="file"
+                  id="category-image-input"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      setCategoryImage(file)
+                      setImagePreview(URL.createObjectURL(file))
+                    }
+                  }}
+                  name="category-image"
+                />
+                {imagePreview ? (
+                  <img src={imagePreview} alt="preview da imagem" className="w-full h-full z-0 absolute object-cover inset-0" />
+                ) : (
+                  <i className="fa-solid fa-plus text-5xl cursor-pointer alt-color-5"></i>
+                )}
+              </div>
+            </div>
+
+            <div className="form-control mb-4">
+                <label className="label">
+                    <span className="label-text alt-color-5">Nome da categoria</span>
+                </label>
+                <input type="text" placeholder="Digite o nome da categoria" className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5" required value={categoryName} onChange={(e) => setCategoryName(e.target.value)} name='category-name' />
+            </div>
+        </ShortModal>
+      )}
+
+      {showDeleteCategoryModal && (
+          <DeleteConfirmationModal
+              title="Confirmar Exclusão"
+              message="Você tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
+              onConfirm={handleDeleteCategoryConfirm}
+              onCancel={handleDeleteCategoryCancel}
+          />
+      )}
 
       {/* Componente flash message, verifica se o estado flash é true e então renderiza a flash message */}
       {flash && (

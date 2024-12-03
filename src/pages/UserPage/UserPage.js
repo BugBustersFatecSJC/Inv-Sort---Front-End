@@ -7,7 +7,7 @@ import FlashMessage from '../../components/FlashMessage/FlashMessage'; // Import
 
 const UserPage = () => {
   const [users, setUsers] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState([]);
   const [newUser, setNewUser] = useState({ username: '', email: '', role: 'funcionario' });
   const [error, setError] = useState('');
   const [flash, setFlash] = useState(null); // Estado para mensagem flash
@@ -87,7 +87,7 @@ const UserPage = () => {
 
   return (
     <MainPage title="Gerencie usuários">
-      <div className="flex-1 flex justify-center items-center bg-brorange-800">
+      <div className="flex-1 flex justify-center items-center ">
         <div className="flex border-4 border-[rgb(107,55,16)] h-5/6 w-1/2 bg-[rgb(255,195,118)]">
           <section className="border-4 border-[rgb(180,81,5)] h-full w-full shadow-inner p-4">
             {flash && (
