@@ -7,85 +7,52 @@ import Loading from '../../components/Loading/Loading'
 import SearchBar from '../../components/SearchBarAlt/SearchBarAlt'
 import FilterButton from '../../components/FilterButton/FilterButton'
 import { motion } from 'framer-motion'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'; // Icones da Filtragem
 
 function MainPageRender() {
-  /**
-   * Renderização do componente de loading
-   */
   const [loading, setLoading] = useState(true)
-
-  /**
-   * Funcionalidade para pegar todas as categorias para renderizar o componente
-   * de cada categoria, setCategories gera uma lista com as
-   * categorias, nas quais podemos iterar sobre
-   */
   const [categories, setCategories] = useState([])
-
-  const fetchCategories = async () => {
-    try {
-      await api.get('/category')
-      .then(response => setCategories(response.data))
-      fetchProducts()
-    } catch(err) {
-      console.log(err)
-    }
-  }
-
   const [products, setProducts] = useState([])
-
-  const fetchProducts = async () => {
-    try {
-      await api.get('/products')
-      .then(response => setProducts(response.data))
-    } catch(err) {
-      console.log(err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filter, setFilter] = useState('alphabetical')
+  const [currentPage, setCurrentPage] = useState(1)
+  const categoriesPerPage = 11
+  const [lastAddedId, setLastAddedId] = useState(null)
 
   useEffect(() => {
     setLoading(true)
     fetchCategories()
   }, [])
 
-  /**
-   * Função para dinamicamente adicionar a nova categoria após ela ser criada
-   */
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/category')
+      setCategories(response.data)
+      fetchProducts()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get('/products')
+      setProducts(response.data)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const addCategory = (newCategory) => {
     setCategories((prevCategories) => [...prevCategories, newCategory])
   }
 
-  const [lastAddedId, setLastAddedId] = useState(null)
-
-  /**
-   * Função para dinamicamente adicionar o novo produto após ele ser criado
-   */
-  const addProduct = (newProduct) => {
-    setProducts((prevProducts) => [...prevProducts, newProduct])
+  const removeCategory = (categoryId) => {
+    setCategories((prevCategories) => prevCategories.filter(category => category.category_id !== categoryId))
   }
 
-  /**
-   * Função para remover dinamicamente o produto
-   */
-  const removeProduct = (productId) => {
-     setProducts((prevProducts) => prevProducts.filter(product => product.product_id !== productId))
-  }
-
-  /**
-   * Função para editar dinamicamente o produto
-   */
-  const updateProduct = (productId, updatedProduct) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.product_id === productId ? { ...product, ...updatedProduct } : product
-      )
-    )
-  }
-
-  /**
-   * Função para dinamicamente atualizar a categoria
-   */
   const updateCategory = (categoryId, newCategoryName, newCategoryImage) => {
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
@@ -96,24 +63,22 @@ function MainPageRender() {
     )
   }
 
-  /**
-   * Função para remover a categoria
-   */
-  const removeCategory = (categoryId) => {
-    setCategories((prevCategories) => prevCategories.filter(
-      category => category.category_id !== categoryId 
-     ))
-    }
+  const addProduct = (newProduct) => {
+    setProducts((prevProducts) => [...prevProducts, newProduct])
+  }
 
-  /**
-   * Barra de pesquisa
-   */
-  const [searchQuery, setSearchQuery] = useState('')
+  const removeProduct = (productId) => {
+    setProducts((prevProducts) => prevProducts.filter(product => product.product_id !== productId))
+  }
 
-  /**
-   * Filtra as categorias
-   */
-  const [filter, setFilter] = useState('alphabetical')
+  const updateProduct = (productId, updatedProduct) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.product_id === productId ? { ...product, ...updatedProduct } : product
+      )
+    )
+  }
+
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter)
   }
@@ -142,96 +107,134 @@ function MainPageRender() {
     }
   }
 
-  /**
-   * Paginação
-   */
-
-  const categoriesPerPage = 11
-  const [currentPage, setCurrentPage] = useState(1)
-
-  const indexOfLastCategory = currentPage * categoriesPerPage
-  const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage
-  const currentCategories = categories.slice(indexOfFirstCategory, indexOfLastCategory)
-
-  const totalPages = Math.ceil(categories.length / categoriesPerPage)
-
-  const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-  const goToPreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
-
-  const sortedAndFilteredCategories = sortCategories(
-    currentCategories.filter((category) =>
-      category.category_name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filterAndSortCategories = () => {
+    return sortCategories(
+      categories.filter(category =>
+        category.category_name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     )
+  }
+
+  const filteredCategories = filterAndSortCategories()
+  const totalPages = Math.ceil(filteredCategories.length / categoriesPerPage)
+
+  const currentItems = filteredCategories.slice(
+    (currentPage - 1) * categoriesPerPage,
+    currentPage * categoriesPerPage
   )
-  
-  return (<div className='flex '>
-    <MainPage title="Categorias de Produtos">
-    <div className="flex justify-between items-center mb-4 tools-container">
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
+
+  const paginationRange = () => {
+    let pages = []
+    if (totalPages <= 5) {
+      pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+    } else {
+      if (currentPage <= 3) {
+        pages = [1, 2, 3, '...', totalPages]
+      } else if (currentPage >= totalPages - 2) {
+        pages = [1, '...', totalPages - 2, totalPages - 1, totalPages]
+      } else {
+        pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages]
+      }
+    }
+    return pages
+  }
+
+  return (
+    <div className='flex'>
+      <MainPage title="Categorias de Produtos">
+        <div className="flex justify-between items-center mb-4 tools-container">
           <SearchBar onSearch={setSearchQuery} />
           <FilterButton onFilterChange={handleFilterChange} />
-    </div>
+        </div>
 
-      {loading ? (
-        <Loading />
-
-      ) : (<> 
-              
-        <div className="flex justify-between gap-4 grid mt-6 grid-cols-4 category-container-grid">
-        
-        <Category onCategoryAdded={(newCategory) => {
-                addCategory(newCategory)
-                setLastAddedId(newCategory.category_id)
-              }} />
-          {sortedAndFilteredCategories.map((category) => {
-            const categoryProducts = products.filter(
-              (product) => product.category_id === category.category_id
-            );
-            return (
-              <motion.div
-                key={category.category_id}
-                initial={lastAddedId === category.category_id ? { scale: 0.8, opacity: 0 } : {}}
-                animate={lastAddedId === category.category_id ? { scale: 1, opacity: 1 } : {}}
-                transition={{
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                  duration: 0.5,
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className="flex justify-between gap-4 grid mt-6 grid-cols-4 category-container-grid">
+              <Category
+                onCategoryAdded={(newCategory) => {
+                  addCategory(newCategory)
+                  setLastAddedId(newCategory.category_id)
                 }}
-              > 
-                <ProductCategory
+              />
+              {currentItems.map((category) => {
+                const categoryProducts = products.filter(
+                  (product) => product.category_id === category.category_id
+                )
+                return (
+                  <motion.div
+                    key={category.category_id}
+                    initial={lastAddedId === category.category_id ? { scale: 0.8, opacity: 0 } : {}}
+                    animate={lastAddedId === category.category_id ? { scale: 1, opacity: 1 } : {}}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 20,
+                      duration: 0.5,
+                    }}
+                  >
+                    <ProductCategory
+                      categoryKey={category.category_id}
+                      products={categoryProducts}
+                      onProductAdded={addProduct}
+                      onProductDeleted={removeProduct}
+                      categoryName={category.category_name}
+                      onCategoryUpdated={updateCategory}
+                      onCategoryDeleted={removeCategory}
+                      onProductUpdated={updateProduct}
+                      categoryImage={category.category_image}
+                      category={category}
+                    />
+                  </motion.div>
+                )
+              })}
+            </div>
 
-                  key={category.category_id}
-                  categoryKey={category.category_id}
-                  products={categoryProducts}
-                  onProductAdded={addProduct}
-                  onProductDeleted={removeProduct}
-                  categoryName={category.category_name}
-                  onCategoryUpdated={updateCategory}
-                  onCategoryDeleted={removeCategory}
-                  onProductUpdated={updateProduct}
-                  categoryImage={category.category_image}
-                  category={category}
-                />
-            </motion.div>
-            );
-          })}
-        </div>
+            <div className="pagination flex justify-center mt-4">
+              <button
+                className="bg-[#6B3710] text-[#FFC376] font-medium px-4 py-2 rounded-lg mr-2 hover:bg-[#4e2d19] disabled:bg-[#4c2a17] disabled:text-[#ccc] disabled:cursor-not-allowed"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeftIcon className="h-5 w-5 text-[#FFC376]" />
+              </button>
 
-        <div className="flex justify-center items-center space-x-4 mt-4">
-              <button onClick={goToPreviousPage} disabled={currentPage === 1} className="shadow-none w-[2rem]">
-                <img src="/img/pointer-2.svg" alt="Previous" />
+              {paginationRange().map((page, index) =>
+                page === '...' ? (
+                  <span key={index} className="px-4 py-2">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={index}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded-lg ${
+                      currentPage === page ? 'bg-[#4e2d19] text-[#FFC376]' : 'text-[#6B3710] hover:bg-[#C17B46]'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                className="bg-[#6B3710] text-[#FFC376] font-medium px-4 py-2 rounded-lg ml-2 hover:bg-[#4e2d19] disabled:bg-[#4c2a17] disabled:text-[#ccc] disabled:cursor-not-allowed"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRightIcon className="h-5 w-5 text-[#FFC376]" />
               </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button onClick={goToNextPage} disabled={currentPage === totalPages} className="shadow-none w-[2rem]">
-                <img src="/img/pointer-1.svg" alt="Next" />
-              </button>
-        </div>
-        </>
-      )}
-      
-    </MainPage>
+            </div>
+          </>
+        )}
+      </MainPage>
     </div>
-  );  
+  )
 }
-  
-  export default MainPageRender
+
+export default MainPageRender
