@@ -45,6 +45,7 @@ function UserProfileIcon() {
     setUser(null);
     navigate('/login');
   };
+  
 
   if (!user) {
     return null;
@@ -144,6 +145,7 @@ function UserProfileIcon() {
 
         <figure
           className="bg-white rounded-full w-[3rem] h-[3rem] flex items-center justify-center cursor-pointer"
+          onClick={navigateUserProfile}
         >
           {user.user_img ? (
             <img
