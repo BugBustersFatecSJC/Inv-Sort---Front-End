@@ -38,7 +38,7 @@ function EditSectorModal({ sector, onSectorUpdated, onClose }) {
         <label className="label">Nome do Setor</label>
         <input
           type="text"
-          className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+          className="p-[4px] poppins-medium shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded  text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
           value={sectorName}
           onChange={(e) => setSectorName(e.target.value)}
           required

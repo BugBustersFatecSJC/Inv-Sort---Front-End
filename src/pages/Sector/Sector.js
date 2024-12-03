@@ -189,7 +189,7 @@ function LocalPage() {
             <div className=''>
               <div className='flex justify-between w-full items-end mb-6 table-header-container'>
                 <div className='flex items-end'>
-                  <p className="font-pixel text-2xl cursor-pointer p-2 bg-[#008148] rounded text-white" onClick={() => setShowLocalModal(true)}>
+                  <p className="poppins-medium  cursor-pointer p-2 bg-[#008148] rounded text-white" onClick={() => setShowLocalModal(true)}>
                     Adicionar local
                   </p>
                 </div>
@@ -236,13 +236,13 @@ function LocalPage() {
                                     {sector.sector_name}
                                     <button
                                       onClick={() => openEditSectorModal(sector)}
-                                      className="ml-2 font-pixel p-2 justify-center items-center btn-3d bg-[#4162a8]"
+                                      className="ml-2 poppins  justify-center items-center btn-2d"
                                     >
                                       <i className="fa-solid fa-pencil"></i>
                                     </button>
                                     <button
                                       onClick={() => openModalDeleteSector(sector)}
-                                      className="ml-2 font-pixel p-2 justify-center items-center btn-3d bg-[#FF1B1C]"
+                                      className="ml-2 poppins p-2 justify-center items-center  btn-2d" 
                                     >
                                       <i className="fa-solid fa-trash"></i>
                                     </button>
@@ -251,26 +251,28 @@ function LocalPage() {
                             </ul>
                           </td>
                           <td className="text-xs sm:text-sm">
+                              <div className='flex'>
                               <button
                                 onClick={() => openEditLocalModal(local)}
 
-                                className="font-pixel p-2 justify-center items-center btn-3d bg-[#4162a8]"
+                                className="poppins p-2 justify-center items-center btn-3d bg-[#6B3710]"
                               >
                                 <i className="fa-solid fa-pencil"></i>
                               </button>
                               <button
                                 onClick={() => openDeleteModalLocal(local)}
 
-                                className="font-pixel p-2 justify-center items-center btn-3d bg-[#FF1B1C]"
+                                className="poppins p-2 justify-center items-center btn-3d bg-[#FF1B1C]"
                               >
                                 <i className="fa-solid fa-trash"></i>
                               </button>
                               <button
                                 onClick={() => openSectorModal(local.local_id)}
-                                className="font-pixel p-2 justify-center items-center btn-3d bg-[#008148]"
+                                className="poppins p-2 justify-center items-center btn-3d bg-[#008148]"
                               >
                                 <i className="fa-solid fa-plus"></i>
                               </button>
+                              </div>
                             
                           </td>
                         </motion.tr>
