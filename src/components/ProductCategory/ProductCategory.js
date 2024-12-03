@@ -390,6 +390,7 @@ function ProductCategory(props) {
          props.onCategoryUpdated(props.categoryKey, categoryName, categoryImage)
 
          closeCategoryModal()
+         window.location.reload()
          flashInfo()
      } catch (err) {
          console.log(err)

@@ -6,6 +6,7 @@ import Mainchart from '../../components/MainChart/Mainchart';
 import Sectorchart from '../../components/Sectorchart/Sectorchart'
 import api from '../../services/api';
 import Loading from '../../components/Loading/Loading';
+import MainPage from '../MainPage/MainPage';
 function Analytics() {
   const [loading, setloading] = useState(false);
   const [cards, setCards] = useState([])
@@ -52,16 +53,13 @@ function Analytics() {
   console.log(cards);
   
   return (
-    <div className='main-color-bg h-[100%] flex'>
+    <MainPage title='Analytics' className='main-color-bg h-[100%] flex'>
       
       
-      <Sidebar />
-      <div id='main' className='w-[100%] min-h-[100vh] px-4 h-[100%] grid-col-2 flex overflow-scroll overflow-x-hidden flex-wrap flex-col  text-center justify-start items-center'>
       
-        <div className='flex flex-col w-full items-end justify-start p-4'>
-        <UserProfileIcon/>
-
-        </div>
+      <div id='main' className='w-[100%] min-h-[100vh] px-4 py-2 h-[100%] grid-col-2 flex overflow-scroll overflow-x-hidden flex-wrap flex-col  text-center justify-start items-center'>
+      
+        
         
         <div className='flex flex-col h-[400px] py-2 w-full flex-wrap  justify-center border-4   border-[rgb(180,81,5)] outline outline-4 outline-[rgb(107,55,16)] bg-[#FFC376] '>
         <Mainchart />
@@ -83,7 +81,7 @@ function Analytics() {
       </div>
       
             </div>
-      </div>
+      </MainPage>
     
   );
 }

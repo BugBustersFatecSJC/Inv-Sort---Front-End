@@ -1,0 +1,24 @@
+import React from 'react'
+import './ProductModal.css'
+
+function ProductModal(props) {
+  return (
+    <div className="modal modal-open">
+        <div className="modal-box bg-[#FFC376] shadow-[inset_-2px_5px_2px_2px_rgba(0,0,0,0.25)] border-8 border-[#D87B26] min-w-[62%] py-12 prod-modal">
+        <h3 className="font-bold text-lg alt-color-5">{props.title}</h3>
+
+        <form onSubmit={props.handleSubmit}>
+            {props.children}
+
+            <div className="modal-action">
+              <label htmlFor={props.modalName} className="px-5 py-1 quinteral-color-bg rounded font-pixel text-2xl shadow-md hvr-grow alt-color-5-bg tertiary-color cursor-pointer" onClick={props.closeModal}>Cancelar</label>
+              <button type="submit" className="px-5 py-1 quarternary-color-bg rounded font-pixel text-2xl shadow-md hvr-grow alt-color-5">Salvar</button>
+            </div>
+        </form>
+        </div>
+    </div>
+
+  )
+}
+
+export default ProductModal
