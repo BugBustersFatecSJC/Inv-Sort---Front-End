@@ -111,7 +111,7 @@ function Sidebari({ content }) {
                 
                 <MenuItem
                   className="MenuItem poppins-semibold"
-                  icon={<img id="chart" src="/images/arrows.png" />}
+                  icon={<i class="fa-solid fa-truck"></i>}
                   component={<Link to="/suppliers" />}
                 >
                   Fornecedores
@@ -127,7 +127,7 @@ function Sidebari({ content }) {
                 
                 {(role === 'admin' || role === 'gerente') && (
                   <SubMenu
-                    icon={<img id="person" src="/images/profile.png" />}
+                  icon={<i class="fa-solid fa-user-gear"></i>}
                     label="Gerenciar"
                     className="poppins-semibold"
                     
@@ -137,7 +137,7 @@ function Sidebari({ content }) {
                     }}
                   >
                     <MenuItem
-                      icon={<img id="person" src="/images/userpage.png" />}
+                      icon={<i class="fa-solid fa-users"></i>}
                       className="poppins-semibold"
                       component={<Link to="/userpage" />}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
@@ -176,7 +176,7 @@ function Sidebari({ content }) {
                       {collapsed ? 'Config' : 'Configurações'}
                     </MenuItem> */}
                     <MenuItem
-                        icon={<img id="person" src="/images/supplier.png" />}
+                        icon={<i class="fa-solid fa-truck"></i>}
                         className="poppins-semibold"
                         component={<Link to="/suppliers" />}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
@@ -196,7 +196,7 @@ function Sidebari({ content }) {
                         {collapsed ? 'Fornecedores' : 'Fornecedores'}
                       </MenuItem>
                       <MenuItem
-                        icon={<img id="person" src="/images/sector.png" />}
+                        icon={<i class="fa-solid fa-box-open"></i>}
                         className="poppins-semibold"
                         component={<Link to="/sectors" />}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3E1900'}
