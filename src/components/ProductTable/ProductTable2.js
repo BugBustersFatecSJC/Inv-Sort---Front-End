@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import ProductCell from '../ProductCell/ProductCell';
-import SearchBar from '../SearchBar/SearchBar';
 import { useParams } from 'react-router-dom';
 import Modalsbtn from '../Modal/Modalsbtn';
 import Loading from '../Loading/Loading';
@@ -8,6 +7,7 @@ import api from '../../services/api';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'; // Icones da Filtragem
 import ModalProducts from '../ModalProducts/ModalProducts';
 import ProductModal from '../ProductModal/ProductModal'; 
+import SearchBar from '../SearchBarAlt/SearchBarAlt';
 
 const ProductTable = () => {
   const [modal, setIsModalOpen] = useState(false);
@@ -23,6 +23,7 @@ const ProductTable = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20); // Default to 20 for desktop
+
 
   const { id } = useParams();
   console.log(productInfo);
@@ -350,8 +351,10 @@ const ProductTable = () => {
 
   return (
     <div className="product-table max-h-[70%]">
-      <SearchBar handlesSearch={handleSearch} />
-      <div onClick={openRegisterModal} className='cursor-pointer'>Adicionar produto</div>
+      <div className='w-full flex justify-between'>
+        <div onClick={openRegisterModal} className='font-pixel text-2xl cursor-pointer p-2 bg-[#008148] rounded text-white'>Adicionar produto</div>
+        <SearchBar onSearch={handleSearch} />
+      </div>
       <div className="flex cursor-pointer grid mt-4 overflow-y-auto grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center justify-center flex-wrap gap-2 p-1">
         {currentItems.map((product, index) => (
           <ProductCell aoClickar={openModal} product={product} key={index} />
