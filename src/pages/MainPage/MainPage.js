@@ -14,7 +14,7 @@ function MainPage(props) {
   };
 
   return (
-    <div className="flex main-color-bg min-h-[105vh] w-full">
+    <div className="flex main-color-bg min-h-screen w-full">
       <Sidebari />
 
       <div className="w-[100%] flex flex-col items-center">
