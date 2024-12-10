@@ -467,15 +467,16 @@ function ProductCategory(props) {
               
               <div className="flex justify-center rounded-md w-[100%] mt-4 mx-auto  poppins-medium mx-auto">
                 <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={handleClickShow} style={{ color: "var(--tertiary-color)" }}>
-                  <i className="fa-solid fa-eye"></i>
-                  
+                  {/* <i className="fa-solid fa-eye"></i> */}
+                  <img src='/img/eye.png' alt="eye" className='w-6'/>
                 </p>
                 <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => confirmDeleteCategory(props.categoryKey)} style={{ color: "var(--tertiary-color)" }}>
-                  <i className="fa-solid fa-trash"></i>
+                  {/* <i className="fa-solid fa-trash"></i> */}
+                  <img src='/img/trash_can.png' alt="trash can" className='w-4'/>
                 </p>
                 <p className="cursor-pointer text-center mx-2 flex flex-col justify-center w-8" onClick={() => openCategoryModal(props.category)} style={{ color: "var(--tertiary-color)" }}>
-                  <i className="fa-solid fa-pencil"></i>
-                  
+                  {/* <i className="fa-solid fa-pencil"></i> */}
+                  <img src='/img/pencil.png' alt="pencil" className='w-4'/>
                 </p>
               </div>
             </div>

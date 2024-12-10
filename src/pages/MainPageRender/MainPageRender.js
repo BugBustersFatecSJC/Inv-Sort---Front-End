@@ -6,6 +6,7 @@ import Category from '../../components/Category/Category'
 import Loading from '../../components/Loading/Loading'
 import SearchBar from '../../components/SearchBarAlt/SearchBarAlt'
 import FilterButton from '../../components/FilterButton/FilterButton'
+import Pagination from '../../components/Pagination/Pagination'
 import { motion } from 'framer-motion'
 
 function MainPageRender() {
@@ -216,19 +217,14 @@ function MainPageRender() {
             );
           })}
         </div>
-
-        <div className="flex justify-center items-center space-x-4 mt-4">
-              <button onClick={goToPreviousPage} disabled={currentPage === 1} className="shadow-none w-[2rem]">
-                <img src="/img/pointer-2.svg" alt="Previous" />
-              </button>
-              <span>Página {currentPage} de {totalPages}</span>
-              <button onClick={goToNextPage} disabled={currentPage === totalPages} className="shadow-none w-[2rem]">
-                <img src="/img/pointer-1.svg" alt="Next" />
-              </button>
-        </div>
+        
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
         </>
       )}
-      
     </MainPage>
     </div>
   );  

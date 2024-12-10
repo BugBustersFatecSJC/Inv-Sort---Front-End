@@ -32,11 +32,12 @@ const SearchBar = ({ onSearch }) => {
         className="ml-2 shadow-none"
       >
         {query ? (
-          <i className="fa-solid fa-times" style={{ fontSize: '20px' }}></i> 
+          <i className="fa-solid fa-times" style={{ fontSize: '20px' }}></i>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" viewBox="0 0 24 24" width="20" height="20">
-            <path d="M10 2a8 8 0 105.29 14.71l4.58 4.58 1.41-1.42-4.58-4.58A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z" />
-          </svg> 
+          // <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" viewBox="0 0 24 24" width="20" height="20">
+          //   <path d="M10 2a8 8 0 105.29 14.71l4.58 4.58 1.41-1.42-4.58-4.58A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z" />
+          // </svg> 
+          <img src='/img/lupa.png' alt='lupa' className='w-7'/>
         )}
       </button>
     </div>
