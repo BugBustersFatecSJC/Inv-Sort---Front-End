@@ -7,6 +7,7 @@ import Modal from '../Modal/Modal'
 import './Category.css'
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import { motion } from 'framer-motion'
 
 function Category(props) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,23 +35,23 @@ function Category(props) {
      */
     // const handleSubmit = async (e) => {
     //     e.preventDefault();
-    
+
     //     if (!cropper) return;
-    
+
     //     // Obtém a imagem recortada em Blob
     //     cropper.getCroppedCanvas().toBlob((blob) => {
     //         const formData = new FormData();
     //         formData.append("category_name", categoryName);
     //         formData.append("category_image", blob, "category_image.png");
     //         console.log(blob)
-    
+
     //         try {
     //             api
     //                 .post("/category", formData, {
     //                     headers: { "Content-Type": "multipart/form-data" },
     //                 })
     //                 .then((response) => props.onCategoryAdded(response.data));
-    
+
     //             setCategoryName("");
     //             setCategoryImage(null);
     //             setImageSrc(null);
@@ -89,7 +90,7 @@ function Category(props) {
             });
             props.onCategoryAdded(response.data);
             console.log(response.data);
-            
+
             closeModal();
             flashSuccess();
         } catch (err) {
@@ -103,12 +104,23 @@ function Category(props) {
 
     return (
         <>
-            <div onClick={openModal} className='w-full alt-color-6-bg rounded shadow-md cursor-pointer h-[200px] '>
-                <div className='flex flex-col items-center justify-center h-full'>
-                    <i className="fa-solid fa-plus text-4xl"></i>
-                    <p className='mt-4 text-center'>Adicionar categoria</p>
+            <motion.div
+                whileHover="hover"
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                onClick={openModal}
+                className="w-full alt-color-6-bg rounded shadow-md cursor-pointer h-[200px]"
+            >
+                <div className="flex flex-col items-center justify-center h-full">
+                    <motion.i
+                        className="fa-solid fa-plus text-4xl"
+                        variants={{
+                            hover: { scale: 1.4 },
+                        }}
+                    ></motion.i>
+                    <p className="mt-4 text-center">Adicionar categoria</p>
                 </div>
-            </div>
+            </motion.div>
 
             {isModalOpen && (
                 <ShortModal
