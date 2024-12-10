@@ -25,9 +25,9 @@ function MainPageRender() {
   const fetchCategories = async () => {
     try {
       await api.get('/category')
-      .then(response => setCategories(response.data))
+        .then(response => setCategories(response.data))
       fetchProducts()
-    } catch(err) {
+    } catch (err) {
       console.log(err)
     }
   }
@@ -37,8 +37,8 @@ function MainPageRender() {
   const fetchProducts = async () => {
     try {
       await api.get('/products')
-      .then(response => setProducts(response.data))
-    } catch(err) {
+        .then(response => setProducts(response.data))
+    } catch (err) {
       console.log(err)
     } finally {
       setLoading(false)
@@ -70,7 +70,7 @@ function MainPageRender() {
    * Função para remover dinamicamente o produto
    */
   const removeProduct = (productId) => {
-     setProducts((prevProducts) => prevProducts.filter(product => product.product_id !== productId))
+    setProducts((prevProducts) => prevProducts.filter(product => product.product_id !== productId))
   }
 
   /**
@@ -102,9 +102,9 @@ function MainPageRender() {
    */
   const removeCategory = (categoryId) => {
     setCategories((prevCategories) => prevCategories.filter(
-      category => category.category_id !== categoryId 
-     ))
-    }
+      category => category.category_id !== categoryId
+    ))
+  }
 
   /**
    * Barra de pesquisa
@@ -156,78 +156,98 @@ function MainPageRender() {
 
   const totalPages = Math.ceil(categories.length / categoriesPerPage)
 
-  const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-  const goToPreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
-
   const sortedAndFilteredCategories = sortCategories(
     currentCategories.filter((category) =>
       category.category_name.toLowerCase().includes(searchQuery.toLowerCase())
     )
   )
-  
-  return (<div className='flex '>
-    <MainPage title="Categorias de Produtos">
-    <div className="flex justify-between items-center mb-4 tools-container">
+
+  const pageTransition = {
+    initial: { y: 20, scale: 0.97 },
+    animate: { y: 0, scale: 1 },
+    exit: { y: -20, scale: 0.97 },
+    transition: { type: "spring", stiffness: 250, damping: 30, duration: 0.5 },
+  };
+
+  return (
+    <div className='flex '>
+      <MainPage title="Categorias de Produtos">
+        <div className="flex justify-between items-center mb-4 tools-container">
           <SearchBar onSearch={setSearchQuery} />
           <FilterButton onFilterChange={handleFilterChange} />
-    </div>
-
-      {loading ? (
-        <Loading />
-
-      ) : (<> 
-              
-        <div className="flex justify-between gap-4 grid mt-6 grid-cols-4 category-container-grid">
-        
-        <Category onCategoryAdded={(newCategory) => {
-                addCategory(newCategory)
-                setLastAddedId(newCategory.category_id)
-              }} />
-          {sortedAndFilteredCategories.map((category) => {
-            const categoryProducts = products.filter(
-              (product) => product.category_id === category.category_id
-            );
-            return (
-              <motion.div
-                key={category.category_id}
-                initial={lastAddedId === category.category_id ? { scale: 0.8, opacity: 0 } : {}}
-                animate={lastAddedId === category.category_id ? { scale: 1, opacity: 1 } : {}}
-                transition={{
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                  duration: 0.5,
-                }}
-              > 
-                <ProductCategory
-
-                  key={category.category_id}
-                  categoryKey={category.category_id}
-                  products={categoryProducts}
-                  onProductAdded={addProduct}
-                  onProductDeleted={removeProduct}
-                  categoryName={category.category_name}
-                  onCategoryUpdated={updateCategory}
-                  onCategoryDeleted={removeCategory}
-                  onProductUpdated={updateProduct}
-                  categoryImage={category.category_image}
-                  category={category}
-                />
-            </motion.div>
-            );
-          })}
         </div>
-        
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
-        </>
-      )}
-    </MainPage>
+
+        {loading ? (
+          <Loading />
+
+        ) : (
+          <>
+            <motion.div
+              key={currentPage}
+              initial={pageTransition.initial}
+              animate={pageTransition.animate}
+              exit={pageTransition.exit}
+              transition={pageTransition.transition}
+              className="flex justify-between gap-4 grid mt-6 grid-cols-4 category-container-grid"
+            >
+              <Category
+                onCategoryAdded={(newCategory) => {
+                  addCategory(newCategory);
+                  setLastAddedId(newCategory.category_id);
+                }}
+              />
+              {sortedAndFilteredCategories.map((category) => {
+                const categoryProducts = products.filter(
+                  (product) => product.category_id === category.category_id
+                );
+                return (
+                  <motion.div
+                    key={category.category_id}
+                    initial={
+                      lastAddedId === category.category_id
+                        ? { scale: 0.8, opacity: 0 }
+                        : {}
+                    }
+                    animate={
+                      lastAddedId === category.category_id
+                        ? { scale: 1, opacity: 1 }
+                        : {}
+                    }
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 20,
+                      duration: 0.5,
+                    }}
+                  >
+                    <ProductCategory
+                      key={category.category_id}
+                      categoryKey={category.category_id}
+                      products={categoryProducts}
+                      onProductAdded={addProduct}
+                      onProductDeleted={removeProduct}
+                      categoryName={category.category_name}
+                      onCategoryUpdated={updateCategory}
+                      onCategoryDeleted={removeCategory}
+                      onProductUpdated={updateProduct}
+                      categoryImage={category.category_image}
+                      category={category}
+                    />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </>
+        )}
+      </MainPage>
     </div>
-  );  
+  );
 }
-  
-  export default MainPageRender
+
+export default MainPageRender
