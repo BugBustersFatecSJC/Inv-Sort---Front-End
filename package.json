@@ -17,6 +17,8 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-cropper": "^2.3.3",
     "react-dom": "^18.3.1",
+    "react-gesture-responder": "^2.1.0",
+    "react-grid-dnd": "^2.1.2",
     "react-modal": "^3.16.1",
     "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^6.26.2",
