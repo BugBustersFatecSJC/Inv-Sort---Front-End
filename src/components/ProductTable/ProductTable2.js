@@ -63,7 +63,7 @@ const ProductTable = () => {
             if (window.innerWidth <= 768) {
                 setItemsPerPage(6); // Mobile (6 items per page)
             } else {
-                setItemsPerPage(20); // Desktop (20 items per page)
+                setItemsPerPage(15); // Desktop (20 items per page)
             }
         };
 
