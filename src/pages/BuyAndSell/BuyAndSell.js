@@ -36,7 +36,7 @@ function BuyAndSell() {
 
 			<div className="flex bg-[rgb(255,195,118)]  ">
 
-				<section className="border-0 border-[rgb(180,81,5)] w-full shadow-inner">
+				<section className="border-0 border-[rgb(180,81,5)] w-full">
 					{/* Barra de pesquisa (componente que você pode personalizar se necessário) */}
 					<ProductTable products={products} /> {/* Passando os produtos como prop para o ProductTable */}
 				</section>

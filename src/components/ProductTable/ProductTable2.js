@@ -329,7 +329,7 @@ const ProductTable = () => {
                 <div onClick={openRegisterModal} className='font-pixel text-2xl cursor-pointer p-2 bg-[#008148] rounded text-white'>Adicionar produto</div>
                 <SearchBar onSearch={handleSearch} />
             </div>
-            <div className="flex cursor-pointer grid mt-4 overflow-y-auto grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center justify-center flex-wrap gap-2 p-1">
+            <div className="flex grid mt-4 overflow-y-auto grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center justify-center flex-wrap gap-2 p-1">
                 {currentItems.map((product, index) => (
                     <ProductCell aoClickar={openModal} product={product} key={index} />
                 ))}
@@ -345,7 +345,15 @@ const ProductTable = () => {
             {/* Modal to display product information */}
             {modal && (
                 <Modalsbtn closeModal={closeModal} title={productInfo.product_name} modalName="cria-categoria" >
-                    {productInfo ? <ModalProducts closeModal={closeModal} productInfo={productInfo} /> : <Loading />}
+                    {productInfo ? <ModalProducts productInfo={productInfo} closeButton={
+                        <p
+                            className='cursor-pointer text-[#6B3710] absolute right-8 top-6 rounded-full flex w-8 h-8 text-center align-middle bg-red-500'
+                            style={{ color: 'var(--tertiary-color)' }}
+                            onClick={closeModal}
+                        >
+                            <i className="fa-solid m-auto fa-times"></i>
+                        </p>
+                    } /> : <Loading />}
                 </Modalsbtn>
             )}
 
