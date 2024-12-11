@@ -3,6 +3,7 @@ import Loading from '../Loading/Loading'
 import { useState } from 'react'
 import 'react-tippy/dist/tippy.css'
 import './ModalProduct.css'
+
 function ModalProducts(props) {
 	const [modal, setIsModal] = useState(1);
 	const { productInfo } = props
@@ -12,6 +13,7 @@ function ModalProducts(props) {
 	const editModal = () => {
 		setIsModal(0)
 	}
+
 	if (modal == 1) {
 		return (
 			<div className='flex w-full flex-wrap'>
@@ -22,16 +24,16 @@ function ModalProducts(props) {
 				</div>
 				<div className='w-full mt-10 sm:mt-0  '>
 					<div>
-						<p> Estoque : </p>
+						<p> Estoque</p>
 						<p className={inputmodal}>{productInfo.product_stock} Un.</p>
-						<p> Estoque Mínimo : </p>
+						<p className='mt-3'> Estoque Mínimo</p>
 						<p className={inputmodal}>{productInfo.product_stock_min} Un.</p>
-						<p> Valor de custo : </p>
+						<p className='mt-3'> Valor de custo</p>
 						<p className={inputmodal}>R$ {productInfo.prod_cost_value}</p>
-						<p> Valor de venda : </p>
+						<p className='mt-3'> Valor de venda</p>
 						<p className={inputmodal}> R$ {productInfo.prod_sell_value}</p>
 					</div>
-					<div>
+					{/* <div>
 						<h1 className='text-xl my-2'>Lotes:</h1>
 						<div className='mt-4 flex grid grid-cols-5 bg-[#6B3710] text-white'>
 							<p className='col-span-1 text-center'>Id</p>
@@ -52,7 +54,7 @@ function ModalProducts(props) {
 							}) : <Loading />}
 
 						</div>
-					</div>
+					</div> */}
 					<div className='flex py-[2px] flex-col'>
 						<h1 className='text-xl my-2'>Fornecedores:</h1>
 						<div className=' flex grid grid-cols-6 bg-[#6B3710] text-white'>
@@ -70,9 +72,9 @@ function ModalProducts(props) {
 						<p className='mt-2'> É perecível :</p>
 						<p className={inputmodal}>{productInfo.product_perishable ? 'Sim' : 'Não'}</p>
 						<div className='my-4 flex justify-center '>
-							<a className="bg-[#30551A] cursor-pointer mx-1 px-3 py-2 text-white rounded-md" >Comprar</a>
+							<a className="bg-[#30551A] cursor-pointer mx-1 px-3 py-2 text-white rounded-md font-pixel text-2xl">Comprar</a>
 							<a
-								className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md"
+								className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md font-pixel text-2xl"
 							>
 								Vender
 							</a>

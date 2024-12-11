@@ -291,7 +291,7 @@ const ProductTable = () => {
             setProductStock('')
             setProductStockMin('')
             setQuantityMax('')
-            closeModal()
+            closeRegisterModal()
             flashSuccess()
         } catch (err) {
             console.log(err)
