@@ -3,7 +3,8 @@ import Loading from '../Loading/Loading'
 import { useState } from 'react'
 import 'react-tippy/dist/tippy.css'
 import './ModalProduct.css'
-import DraggableModal from '../DraggableModal/DraggableModal'
+import DeleteConfirmationModal from '../DeleteConfirmationProductModal/DeleteConfirmationProductModal';
+import api from '../../services/api'
 
 function ModalProducts(props) {
 	const [modal, setIsModal] = useState(1);
@@ -14,6 +15,34 @@ function ModalProducts(props) {
 	const editModal = () => {
 		setIsModal(0)
 	}
+
+	const [showDeleteProductModal, setShowDeleteProductModal] = useState(false);
+	const [productToDelete, setProductToDelete] = useState(null);
+	
+	const confirmDeleteProduct = (productId) => {
+		setProductToDelete(productId);
+		setShowDeleteProductModal(true);
+	};
+	
+	const handleDeleteProductCancel = () => {
+		setProductToDelete(null);
+		setShowDeleteProductModal(false);
+	};
+	
+	const handleDeleteProductConfirm = async () => {
+		if (!productToDelete) return;
+	
+		try {
+			await api.delete(`/products/${productToDelete}`);
+			props.onProductDeleted(productToDelete);
+			window.location.reload()
+		} catch (err) {
+			console.error(err);
+		} finally {
+			setProductToDelete(null);
+			setShowDeleteProductModal(false);
+		}
+	};
 
 	if (modal == 1) {
 		return (
@@ -74,15 +103,23 @@ function ModalProducts(props) {
 						<p className={inputmodal}>{productInfo.product_perishable ? 'Sim' : 'Não'}</p>
 						<div className='my-4 flex justify-center '>
 							<a
-								className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md font-pixel text-2xl"
+								className="bg-[#8B2121]  cursor-pointer mx-1 px-3 py-2 text-white rounded-md font-pixel text-2xl" onClick={() => confirmDeleteProduct(productInfo.product_id)}
 							>
 								Excluir
 							</a>
 						</div>
 					</div>
 				</div>
-
-
+				{showDeleteProductModal && (
+					<div className='w-[60vw]'>
+						<DeleteConfirmationModal
+							title="Confirmar Exclusão"
+							message="Você tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
+							onConfirm={handleDeleteProductConfirm}
+							onCancel={handleDeleteProductCancel}
+						/>
+					</div>
+				)}
 			</div>
 		)
 	}

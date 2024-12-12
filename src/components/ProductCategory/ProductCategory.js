@@ -390,8 +390,8 @@ function ProductCategory(props) {
          props.onCategoryUpdated(props.categoryKey, categoryName, categoryImage)
 
          closeCategoryModal()
-         window.location.reload()
          flashInfo()
+         window.location.reload()
      } catch (err) {
          console.log(err)
          flashError()
@@ -420,13 +420,14 @@ function ProductCategory(props) {
     try {
         await api.delete(`/category/${categoryToDelete}`)
         props.onCategoryDeleted(categoryToDelete)
-        flashInfo('Categoria excluída com sucesso!')
+        flashDelete()
     } catch (err) {
         console.error(err)
         flashError('Erro ao excluir categoria.')
     } finally {
         setCategoryToDelete(null)
         setShowDeleteCategoryModal(false)
+        flashDelete()
     }
   }
 
