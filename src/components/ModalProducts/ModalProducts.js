@@ -15,8 +15,6 @@ function ModalProducts(props) {
 		setIsModal(0)
 	}
 
-	const [isBuyModalVisible, setIsBuyModalVisible] = useState(false);
-
 	if (modal == 1) {
 		return (
 			<div className='flex w-full flex-wrap'>
