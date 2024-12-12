@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import ProductCell from '../ProductCell/ProductCell';
 import { useParams } from 'react-router-dom';
 import Modalsbtn from '../Modal/Modalsbtn';
@@ -9,6 +9,9 @@ import ModalProducts from '../ModalProducts/ModalProducts';
 import ProductModal from '../ProductModal/ProductModal';
 import SearchBar from '../SearchBarAlt/SearchBarAlt';
 import Pagination from '../Pagination/Pagination';
+import DraggableModal from '../DraggableModal/DraggableModal';
+import { UserContext } from '../../context/userContext';
+import FlashMessage from '../FlashMessage/FlashMessage';
 
 const ProductTable = () => {
     const [modal, setIsModalOpen] = useState(false);
@@ -98,7 +101,6 @@ const ProductTable = () => {
             try {
                 const response = await api.get(`/product/${productId}`);
                 setProductInfo(response.data);
-                flashSuccess();
             } catch (err) {
                 console.error(err);
                 if (err.response?.status === 400 && err.response.data.error.code === 'P2002') {
@@ -323,10 +325,54 @@ const ProductTable = () => {
         }
     }, [productImage])
 
+    /**
+     * Registra movimentação
+     */
+    const { user, setUser } = useContext(UserContext);
+    const userId = user.user_id; 
+    const [movementQuantity, setMovementQuantity] = useState(0);
+    const [movementType, setMovementType] = useState("");
+    const [movementModal, setMovementModal] = useState(false);
+    const [movementProduct, setMovementProduct] = useState("");
+    const closeMovementModal = () => {
+        setMovementModal(false)
+        setMovementQuantity(0);
+        setMovementType("");
+        setMovementProduct("");
+    }
+
+    const handleMovementSubmit = async (e) => {
+        e.preventDefault()
+
+        const movementData = {
+            product_id: movementProduct,
+            quantity: movementQuantity,
+            movement_type: movementType,
+            user_id: userId, 
+        }
+
+        try {
+            await api
+            .post("/movements", movementData)
+            .then(response => console.log(response.data))          
+            closeMovementModal()
+            flashSuccess()
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+
+        } catch (err) {
+            console.log(err)
+            flashError()
+        }
+    }
+
     return (
         <div className="product-table max-h-[70%]">
             <div className='w-full flex justify-between'>
-                <div onClick={openRegisterModal} className='font-pixel text-2xl cursor-pointer p-2 bg-[#008148] rounded text-white'>Adicionar produto</div>
+                <div onClick={openRegisterModal} className='font-pixel text-xl cursor-pointer p-2 bg-[#008148] rounded text-white'>Adicionar produto</div>
+                <div onClick={() => setMovementModal(true)} className='font-pixel text-xl cursor-pointer p-2 bg-[#4287f5] rounded text-white'>Realizar movimentação</div>
                 <SearchBar onSearch={handleSearch} />
             </div>
             <div className="flex grid mt-4 overflow-y-auto grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 text-center justify-center flex-wrap gap-2 p-1">
@@ -577,6 +623,70 @@ const ProductTable = () => {
                     </div>
                 </ProductModal>
             )}
+
+            {movementModal && (
+                <DraggableModal
+                        onClose={closeMovementModal}
+                        onSubmit={handleMovementSubmit}
+                    >            
+                    <div className='w-full'>
+                        <div className="form-control mb-4">
+                            <label className="label">
+                                <span className="label-text alt-color-5">Produto</span>
+                            </label>
+                            <select 
+                                value={movementProduct} 
+                                onChange={(e) => setMovementProduct(e.target.value)} 
+                                className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+                            >
+                                <option disabled value="">Selecionar produto</option>
+                                {products.map((product) => (
+                                <option key={product.product_id} value={product.product_id}>{product.product_name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-control mb-4 w-full">
+                            <label className="label">
+                                <span className="label-text alt-color-5">Quantidade</span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="Digite a quantidade da movimentação"
+                                className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+                                required
+                                name='product_name'
+                                value={movementQuantity}
+                                onChange={(e) => setMovementQuantity(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-control mb-4">
+                            <label className="label">
+                                <span className="label-text alt-color-5">Tipo</span>
+                            </label>
+                            <select
+                                value={movementType}
+                                onChange={(e) => setMovementType(e.target.value)}
+                                className="p-[4px] shadow-[0px_2px_2px_2px_rgba(0,0,0,0.25)] ring ring-2 ring-[#BF823C] focus:ring-[#3E1A00] outline-none quinteral-color-bg rounded font-pixel text-xl transition-all duration-[100ms] ease-in-out alt-color-5"
+                            >
+                                <option disabled value="">Selecione um tipo</option>
+                                <option value="compra">Compra</option>
+                                <option value="venda">Venda</option>
+                            </select>
+                        </div>
+                    </div>
+                </DraggableModal>
+            )}
+
+{       flash && (
+          <FlashMessage
+              message={flash.message}
+              type={flash.type}
+              duration={3000}
+              onClose={() => setFlash(null)}
+          />
+        )}
         </div>
     );
 };

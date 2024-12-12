@@ -1,0 +1,38 @@
+.draggable-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+}
+
+.draggable-modal {
+    position: absolute;
+    width: 400px;
+    background: #FFC376;
+    border: 2px solid #D87B26;
+    border-radius: 8px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.draggable-modal-header {
+    background: #3E1900;
+    color: white;
+    padding: 10px;
+    cursor: grab;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    user-select: none;
+}
+
+.draggable-modal-header:active {
+    cursor: grabbing;
+}
+
+.draggable-modal-content {
+    padding: 20px;
+}
