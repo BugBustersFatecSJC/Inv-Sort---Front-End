@@ -74,11 +74,11 @@ function Analytics() {
 
         <div className={`h-[100%]  ${windowWidth<980 ? "w-full my-4":"w-1/2 ml-4 "}   py-2 px-2 flex flex-col justify-between border-4  border-[rgb(180,81,5)] outline outline-4 outline-[rgb(107,55,16)] bg-[#FFC376]`}>
           
-        <Cardsanalytics text={'Produto de maior faturamento'} label={`${cards[0].product_name}`} data={cards[0].faturamento} />
-        <Cardsanalytics text={'Categoria de maior faturamento'} label={`${cards[1].category_name}`} data={cards[1].faturamento}  />
+        <Cardsanalytics text={'Produto de maior faturamento'} prefix='R$ ' label={`${cards[0].product_name}`} data={cards[0].faturamento} />
+        <Cardsanalytics text={'Categoria de maior faturamento'} prefix='R$ ' label={`${cards[1].category_name}`} data={cards[1].faturamento}  />
         <Cardsanalytics text={'Categoria com mais vendas'} label={`${cards[2].category_name}`} data={cards[2].vendas} sufix=' Un.'  />
         <Cardsanalytics text={'Produto com mais vendas'} label={`${cards[3].product_name}`} data={cards[3].vendas} sufix=' Un.'  />
-        <p className='poppins-bold text-[10px] text-start'>Dados em relação ao mês anterior</p>
+        <p className='poppins-bold text-[10px] text-start'>Dados em relação ao ano anterior</p>
         </div>
       </div>
       
